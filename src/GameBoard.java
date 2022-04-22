@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 
-public class GameBoard {
+public class GameBoard implements Comparable<GameBoard> {
     private final myNode[][] board;
     public static myNode[][] goal;
     private final int size;
@@ -10,20 +10,24 @@ public class GameBoard {
     private GameBoard parent;
     private static boolean boardFlag = false;
     static int totalOpen = 0;
+    private boolean isOpen;
+    private int info = 0;
+    private int stateValue = 0;
+
 
     public GameBoard getParent() {
         return parent;
     }
 
 
-    public GameBoard(String path) {
-        GameInfo gi = new GameInfo(path);
+    public GameBoard(GameInfo gi) {
         size = gi.getInit().length;
         board = new myNode[size][size];
         goal = new myNode[size][size];
-        initializeBoard3(gi.getInit());
-        initializeBoard3(gi.getGoal());
+        initializeBoard3Or5(gi.getInit());
+        initializeBoard3Or5(gi.getGoal());
         parent = null;
+        isOpen = gi.isNoOpen();
 
     }
 
@@ -35,7 +39,7 @@ public class GameBoard {
     }
 
 
-    private void initializeBoard3(String[][] mat) {
+    private void initializeBoard3Or5(String[][] mat) {
         myNode[][] temp;
         if (!boardFlag) {
             temp = board;
@@ -73,7 +77,7 @@ public class GameBoard {
 
     private void moveRight(int row, int column) {
         if (column + 1 < size && !board[row][column].getColor().equals("_") && board[row][column + 1].getColor().equals("_")) {
-            if(this.parent != null && parent.board[row][column + 1].getColor().equals(board[row][column].getColor())){
+            if (this.parent != null && parent.board[row][column + 1].getColor().equals(board[row][column].getColor())) {
                 return;
             }
             myNode[][] nextState = new myNode[size][size];
@@ -86,16 +90,18 @@ public class GameBoard {
             GameBoard child = new GameBoard(nextState);
             children.add(child);
             child.parent = this;
-//            child.statePath = "(" + (row + 1) + "," + (column + 1) + "):" + board[row][column].getColor() + ":(" + (row + 1) + "," + (column + 2) + ")";
-//            child.totalValue += this.totalValue + board[row][column].getValue();
-            totalOpen ++;
+            child.stateValue += this.stateValue + board[row][column].getValue();
+
+            totalOpen++;
+            System.out.println(totalOpen + " Right");
+            child.printState();
         }
 
     }
 
     private void moveLeft(int row, int column) {
         if (column - 1 >= 0 && !board[row][column].getColor().equals("_") && board[row][column - 1].getColor().equals("_")) {
-            if(this.parent != null && parent.board[row][column - 1].getColor().equals(board[row][column].getColor())){
+            if (this.parent != null && parent.board[row][column - 1].getColor().equals(board[row][column].getColor())) {
                 return;
             }
             myNode[][] nextState = new myNode[size][size];
@@ -108,16 +114,18 @@ public class GameBoard {
             GameBoard child = new GameBoard(nextState);
             children.add(child);
             child.parent = this;
-//            child.statePath = "(" + (row + 1) + "," + (column + 1) + "):" + board[row][column].getColor() + ":(" + (row + 1) + "," + column + ")";
-//            child.totalValue += this.totalValue + board[row][column].getValue();
+            child.stateValue += this.stateValue + board[row][column].getValue();
+
             totalOpen++;
+            System.out.println(totalOpen + " Left");
+            child.printState();
         }
 
     }
 
     private void moveUp(int row, int column) {
         if (row - 1 >= 0 && !board[row][column].getColor().equals("_") && board[row - 1][column].getColor().equals("_")) {
-            if(this.parent != null && parent.board[row - 1][column].getColor().equals(board[row][column].getColor())){
+            if (this.parent != null && parent.board[row - 1][column].getColor().equals(board[row][column].getColor())) {
                 return;
             }
             myNode[][] nextState = new myNode[size][size];
@@ -130,16 +138,18 @@ public class GameBoard {
             GameBoard child = new GameBoard(nextState);
             children.add(child);
             child.parent = this;
-//            child.statePath = "(" + (row + 1) + "," + (column + 1) + "):" + board[row][column].getColor() + ":(" + row  + "," + (column + 1) + ")";
-//            child.totalValue += this.totalValue + board[row][column].getValue();
+            child.stateValue += this.stateValue + board[row][column].getValue();
+
             totalOpen++;
+            System.out.println(totalOpen + " Up");
+            child.printState();
         }
 
     }
 
     private void moveDown(int row, int column) {
         if (row + 1 < size && !board[row][column].getColor().equals("_") && board[row + 1][column].getColor().equals("_")) {
-            if(this.parent != null && parent.board[row + 1][column].getColor().equals(board[row][column].getColor())){
+            if (this.parent != null && parent.board[row + 1][column].getColor().equals(board[row][column].getColor())) {
                 return;
             }
             myNode[][] nextState = new myNode[size][size];
@@ -152,28 +162,18 @@ public class GameBoard {
             GameBoard child = new GameBoard(nextState);
             children.add(child);
             child.parent = this;
-//            child.statePath = "(" + (row + 1) + "," + (column + 1) + "):" + board[row][column].getColor() + ":(" + (row + 2)  + "," + (column + 1) + ")";
-//            child.totalValue += this.totalValue + board[row][column].getValue();
-            totalOpen ++;
+            child.stateValue += this.stateValue + board[row][column].getValue();
+
+            totalOpen++;
+            System.out.println(totalOpen + " Down");
+            child.printState();
         }
 
     }
-
-
     private void copyState(myNode[][] nextState) {
         for (int i = 0; i < size; i++) {
             System.arraycopy(board[i], 0, nextState[i], 0, size);
         }
-    }
-
-    private boolean isSameGameBoard(myNode[][] gb) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (!board[i][j].equals(gb[i][j]))
-                    return false;
-            }
-        }
-        return true;
     }
 
     public boolean isGoal() {
@@ -215,5 +215,29 @@ public class GameBoard {
 
     public myNode[][] getBoard() {
         return board;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public int getInfo() {
+        return info;
+    }
+
+    public void setInfo(int info) {
+        this.info = info;
+    }
+
+    public int getStateValue() {
+        return stateValue;
+    }
+    public void setStateValue(int value){
+        stateValue += value;
+    }
+
+    @Override
+    public int compareTo(GameBoard o) {
+        return this.stateValue - o.stateValue;
     }
 }
