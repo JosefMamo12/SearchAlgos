@@ -59,6 +59,7 @@ public class Algorithms {
 
     public void dfid(GameBoard root) {
         for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
+            System.out.println(depth);
             HashSet<GameBoard> loopAvoidance = new HashSet<>();
             GameBoard result = limitedDFS(root, depth, loopAvoidance);
             if (result.getInfo() != 1) {
@@ -91,8 +92,7 @@ public class Algorithms {
             cutoff.setInfo(0);
             curr.expandMove();
             for (GameBoard child : curr.getChildren()) {
-                if (loopAvoidance.contains(child))
-                    continue;
+                if (loopAvoidance.contains(child)) continue;
                 GameBoard result = limitedDFS(child, depth - 1, loopAvoidance);
                 if (result.getInfo() == 1) {
                     cutoff.setInfo(1);
@@ -113,35 +113,40 @@ public class Algorithms {
 
     public void aStar(GameBoard root) {
         isOpen = root.isOpen();
-        PriorityQueue<GameBoard> openList = new PriorityQueue<>();
-        HashSet<GameBoard> openListHash = new HashSet<>();
+        PriorityQueue<GameBoard> openList = new PriorityQueue<>(new GameBoard.GameBoardComparator());
+        Hashtable<GameBoard,GameBoard> openListHash = new Hashtable<>();
         HashSet<GameBoard> closedList = new HashSet<>();
         openList.add(root);
-        openListHash.add(root);
+        openListHash.put(root,root);
         while (!openList.isEmpty()) {
             GameBoard curr = openList.poll();
+            if (curr.isGoal()) {
+                buildAnswer(curr);
+                return;
+            }
             closedList.add(curr);
             curr.expandMove();
             for (GameBoard child : curr.getChildren()) {
-                if (!openListHash.contains(child) && !closedList.contains(child)) {
+                if (!openList.contains(child) && !closedList.contains(child)) {
                     openList.add(child);
-                    openListHash.add(child);
-                    if (child.isGoal()) {
-                        buildAnswer(child);
-                        return;
-                    }
+                    openListHash.put(child,child);
+                } else if (openList.contains(child) && openListHash.containsKey(child) && openListHash.get(child).getStateValue() > child.getStateValue()) {
+                    openList.remove(openListHash.get(child));
+                    openList.add(child);
                 }
-            }
-            if (isOpen) {
-                for (GameBoard entry : openListHash) {
-                    entry.printState();
-                    System.out.println("-----");
-                }
-                System.out.println();
-                System.out.println("Next Layer");
             }
 
         }
+        if (isOpen) {
+            for (Map.Entry<GameBoard,GameBoard> entry : openListHash.entrySet()) {
+                entry.getKey().printState();
+                System.out.println("-----");
+            }
+            System.out.println();
+            System.out.println("Next Layer");
+        }
+
+
         outputPath += "no path";
         num = Integer.toString(GameBoard.totalOpen);
 
@@ -164,10 +169,13 @@ public class Algorithms {
         int counter = 0;
         GameBoard firstState = null, secondState;
 
-
+        System.out.println("-------------------");
         while (!path.isEmpty() && counter < 2) {
             if (counter == 0) {
+                path.peek().printState();
+                System.out.println("-----");
                 firstState = path.pop();
+
                 counter++;
             } else {
                 secondState = path.peek();

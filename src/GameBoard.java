@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
+import java.util.Comparator;
 
-public class GameBoard implements Comparable<GameBoard> {
+public class GameBoard {
     private final myNode[][] board;
     public static myNode[][] goal;
     private final int size;
@@ -13,6 +13,8 @@ public class GameBoard implements Comparable<GameBoard> {
     private boolean isOpen;
     private int info = 0;
     private int stateValue = 0;
+    private int stateScale;
+    static int cycle = 0;
 
 
     public GameBoard getParent() {
@@ -73,6 +75,7 @@ public class GameBoard implements Comparable<GameBoard> {
                 moveRight(i, j);
             }
         }
+        cycle++;
     }
 
     private void moveRight(int row, int column) {
@@ -85,16 +88,9 @@ public class GameBoard implements Comparable<GameBoard> {
 
             myNode temp = nextState[row][column + 1];
             nextState[row][column + 1] = nextState[row][column];
-            nextState[row][column] = temp;
-
-            GameBoard child = new GameBoard(nextState);
-            children.add(child);
-            child.parent = this;
-            child.stateValue += this.stateValue + board[row][column].getValue();
-
-            totalOpen++;
-            System.out.println(totalOpen + " Right");
-            child.printState();
+            createChild(row, column, nextState, temp);
+//            System.out.println(totalOpen + " Right");
+//            child.printState();
         }
 
     }
@@ -109,16 +105,9 @@ public class GameBoard implements Comparable<GameBoard> {
 
             myNode temp = nextState[row][column - 1];
             nextState[row][column - 1] = nextState[row][column];
-            nextState[row][column] = temp;
-
-            GameBoard child = new GameBoard(nextState);
-            children.add(child);
-            child.parent = this;
-            child.stateValue += this.stateValue + board[row][column].getValue();
-
-            totalOpen++;
-            System.out.println(totalOpen + " Left");
-            child.printState();
+            createChild(row, column, nextState, temp);
+//            System.out.println(totalOpen + " Left");
+//            child.printState();
         }
 
     }
@@ -133,18 +122,23 @@ public class GameBoard implements Comparable<GameBoard> {
 
             myNode temp = nextState[row - 1][column];
             nextState[row - 1][column] = nextState[row][column];
-            nextState[row][column] = temp;
-
-            GameBoard child = new GameBoard(nextState);
-            children.add(child);
-            child.parent = this;
-            child.stateValue += this.stateValue + board[row][column].getValue();
-
-            totalOpen++;
-            System.out.println(totalOpen + " Up");
-            child.printState();
+            createChild(row, column, nextState, temp);
+//            System.out.println(totalOpen + " Up");
+//            child.printState();
         }
 
+    }
+
+    private void createChild(int row, int column, myNode[][] nextState, myNode temp) {
+        nextState[row][column] = temp;
+
+        GameBoard child = new GameBoard(nextState);
+        children.add(child);
+        child.parent = this;
+        child.stateValue += this.stateValue + board[row][column].getValue();
+        child.stateScale = cycle;
+
+        totalOpen++;
     }
 
     private void moveDown(int row, int column) {
@@ -157,16 +151,9 @@ public class GameBoard implements Comparable<GameBoard> {
 
             myNode temp = nextState[row + 1][column];
             nextState[row + 1][column] = nextState[row][column];
-            nextState[row][column] = temp;
-
-            GameBoard child = new GameBoard(nextState);
-            children.add(child);
-            child.parent = this;
-            child.stateValue += this.stateValue + board[row][column].getValue();
-
-            totalOpen++;
-            System.out.println(totalOpen + " Down");
-            child.printState();
+            createChild(row, column, nextState, temp);
+//            System.out.println(totalOpen + " Down");
+//            child.printState();
         }
 
     }
@@ -189,6 +176,8 @@ public class GameBoard implements Comparable<GameBoard> {
     public ArrayList<GameBoard> getChildren() {
         return children;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -235,9 +224,22 @@ public class GameBoard implements Comparable<GameBoard> {
     public void setStateValue(int value){
         stateValue += value;
     }
-
-    @Override
-    public int compareTo(GameBoard o) {
-        return this.stateValue - o.stateValue;
+    static class GameBoardComparator implements Comparator <GameBoard>{
+        @Override
+        public int compare(GameBoard o1, GameBoard o2) {
+            if(o1.stateValue == o2.stateValue){
+                if(o1.stateScale > o2.stateScale)
+                    return 1;
+                else if(o1.stateScale < o2.stateScale)
+                    return -1;
+            }else{
+                if(o1.stateValue > o2.stateValue)
+                    return 1;
+                else if(o1.stateValue < o2.stateValue)
+                    return -1;
+            }
+            return 0;
+        }
     }
+
 }
