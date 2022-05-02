@@ -17,36 +17,65 @@ public class GameInfo {
     public GameInfo(String path) {
         File f = new File(path);
         int index = 0;
+        int insider = 0;
         int rowCounter = 0;
         Scanner sc;
         try {
             sc = new Scanner(f);
-            while (index < 10) {
+            while (index < 3) {
                 if (index == 0) {
                     algo = sc.nextLine();
+                    index++;
                 } else if (index == 1) {
                     noOpen = !"no open".equals(sc.nextLine());
+                    index++;
                 } else if (index == 2) {
                     sizeOfBoard = sc.nextLine();
                     if (sizeOfBoard.equals("small")) {
                         init = new String[3][3];
                         goal = new String[3][3];
+                        while (insider < 7) {
+                            while (insider <= 2) {
+                                init[rowCounter] = sc.nextLine().split(",");
+                                rowCounter++;
+                                insider++;
+                            }
+                            if (insider == 3) {
+                                rowCounter = 0;
+                                sc.nextLine();
+                                insider++;
+                            }
+                            while (insider >= 4 && insider <= 6) {
+                                goal[rowCounter] = sc.nextLine().split(",");
+                                rowCounter++;
+                                insider++;
+                            }
+                        }
                     } else {
                         init = new String[5][5];
                         goal = new String[5][5];
+                        while (insider < 11) {
+                            while (insider <= 4) {
+                                init[rowCounter] = sc.nextLine().split(",");
+                                rowCounter++;
+                                insider++;
+                            }
+                            if (insider == 5) {
+                                rowCounter = 0;
+                                sc.nextLine();
+                                insider++;
+                            }
+                            while (insider >= 6 && insider <= 10) {
+                                goal[rowCounter] = sc.nextLine().split(",");
+                                rowCounter++;
+                                insider++;
+                            }
+                        }
+
                     }
-                } else if (init != null && index >= 3 && index <= 5) {
-                    init[rowCounter] = sc.nextLine().split(",");
-                    rowCounter++;
-                } else if (index == 6) {
-                    rowCounter = 0;
-                    sc.nextLine();
+                    index++;
                 }
-                else if (goal != null && index >= 7) {
-                    goal[rowCounter] = sc.nextLine().split(",");
-                    rowCounter++;
-                }
-                index++;
+
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
