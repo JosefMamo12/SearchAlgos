@@ -14,10 +14,13 @@ public class Algorithms {
     private String num = "";
     private String cost = "inf";
     private int valueAdder = 0;
-    Stack<GameBoard> path = new Stack<>();
+    private static String[] color3 = new String[]{"R", "B", "G"};
+    private static String[] color4 = new String[]{"R", "B", "G", "Y"};
+    private final Stack<GameBoard> path = new Stack<>();
 
     public void bfs(GameBoard root) {
         isOpen = root.isOpen();
+        GameBoard poopedOne;
         Queue<GameBoard> openList = new LinkedList<>();
         HashSet<GameBoard> openListHash = new HashSet<>();
         HashSet<GameBoard> closedList = new HashSet<>();
@@ -26,6 +29,7 @@ public class Algorithms {
         boolean isSolution = false;
         while (!openList.isEmpty() && !isSolution) {
             GameBoard currBoard = openList.poll();
+            poopedOne = currBoard;
             openListHash.remove(currBoard);
             closedList.add(currBoard);
             for (GameBoard child : currBoard.expandMove()) {
@@ -42,12 +46,13 @@ public class Algorithms {
             }
 
             if (isOpen) {
+                System.out.println("Now pooped:");
+                poopedOne.printState();
+                System.out.println("Open List: ");
                 for (GameBoard entry : openListHash) {
                     entry.printState();
-                    System.out.println("-----");
                 }
                 System.out.println();
-                System.out.println("Next Check");
             }
         }
         if (!isSolution) {
@@ -57,10 +62,12 @@ public class Algorithms {
     }
 
     public void dfid(GameBoard root) {
+        isOpen = root.isOpen();
         for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
             System.out.println(depth);
             HashSet<GameBoard> loopAvoidance = new HashSet<>();
             GameBoard result = limitedDFS(root, depth, loopAvoidance);
+            printFroniter(loopAvoidance);
             if (result.getInfo() != 1) {
                 return;
             }
@@ -97,16 +104,24 @@ public class Algorithms {
             loopAvoidance.remove(curr);
             if (cutoff.getInfo() == 1) {
             } else {
-                cutoff.setInfo(2);
+                cutoff.setInfo(2); /* means it failed and this is not the way  */
+
             }
             return cutoff;
 
         }
     }
 
+    private void printFroniter(HashSet<GameBoard> loopAvoidance) {
+        for (GameBoard gb : loopAvoidance) {
+            gb.printState();
+        }
+    }
+
 
     public void aStar(GameBoard root) {
         isOpen = root.isOpen();
+        int size = root.getSize();
         PriorityQueue<GameBoard> openListQueue = new PriorityQueue<>(new GameBoard.GameBoardComparator());
         Hashtable<GameBoard, GameBoard> openListHash = new Hashtable<>();
         HashSet<GameBoard> closedList = new HashSet<>();
@@ -121,7 +136,7 @@ public class Algorithms {
                 return;
             }
             for (GameBoard child : curr.expandMove()) {
-                child.setChildAfterHeuristic(child.getStateValue() + heuristic(child));
+                child.setChildAfterHeuristic(child.getStateValue() + heuristic(child, size));
                 if (!openListQueue.contains(child) && !closedList.contains(child)) {
                     openListQueue.add(child);
                     openListHash.put(child, child);
@@ -132,15 +147,15 @@ public class Algorithms {
 
                 }
             }
-
-        }
-        if (isOpen) {
-            for (Map.Entry<GameBoard, GameBoard> entry : openListHash.entrySet()) {
-                entry.getKey().printState();
-                System.out.println("-----");
+            if (isOpen) {
+                for (Map.Entry<GameBoard, GameBoard> entry : openListHash.entrySet()) {
+                    entry.getKey().printState();
+                    System.out.println("-----");
+                }
+                System.out.println();
+                System.out.println("Next Layer");
             }
-            System.out.println();
-            System.out.println("Next Layer");
+
         }
 
 
@@ -152,7 +167,8 @@ public class Algorithms {
     public void idaStar(GameBoard root) {
         Stack<GameBoard> openListStack = new Stack<>();
         Hashtable<GameBoard, GameBoard> loopAvoidance = new Hashtable<>();
-        int maxH = heuristic(root);
+        int size = root.getSize();
+        int maxH = heuristic(root, size);
         while (maxH != Integer.MAX_VALUE) {
             int minF = Integer.MAX_VALUE;
             openListStack.add(root);
@@ -165,7 +181,7 @@ public class Algorithms {
                     curr.setInfo(1);
                     openListStack.add(curr);
                     for (GameBoard child : curr.expandMove()) {
-                        child.setChildAfterHeuristic(child.getStateValue() + heuristic(child));
+                        child.setChildAfterHeuristic(child.getStateValue() + heuristic(child, size));
                         if (child.getChildAfterHeuristic() > maxH) {
                             minF = Math.min(minF, child.getChildAfterHeuristic());
                             continue;
@@ -196,12 +212,15 @@ public class Algorithms {
 
         }
     }
+
     public void dfbnb(GameBoard root) {
+        int size = root.getSize();
         Stack<GameBoard> st = new Stack<>();
         ArrayList<GameBoard> childList = new ArrayList<>();
         Hashtable<GameBoard, GameBoard> loopAvoidance = new Hashtable<>();
         GameBoard result = null;
         int t = Integer.MAX_VALUE;
+        root.setChildAfterHeuristic(root.getStateValue() + heuristic(root, size));
         st.add(root);
         loopAvoidance.put(root, root);
         while (!st.isEmpty()) {
@@ -209,9 +228,12 @@ public class Algorithms {
             if (curr.getInfo() == 1) {
                 loopAvoidance.remove(curr);
             } else {
-                curr.setInfo(1);
-                st.add(curr);
-                childList = curr.expandMove();
+                curr.setInfo(1); /* Mark as out */
+                st.add(curr);  /* Reload the stuck with the following current node as marked out to know the path we at right now  */
+                childList = curr.expandMove();/* Return all the possible movements as list */
+//                System.out.println("Size: " + childList.size() + " Open List:");
+//
+//                childList.forEach(GameBoard::printState);
                 setChildHeuristicDistances(childList);
                 childList.sort(new GameBoard.GameBoardComparator());
                 for (int i = 0; i < childList.size(); i++) {
@@ -248,45 +270,102 @@ public class Algorithms {
     }
 
 
-    private int heuristic(GameBoard child) {
-        boolean[][] trueValues = new boolean[child.getBoard().length][child.getBoard().length];
+    private int heuristic(GameBoard child, int size) {
+        Hashtable<String, Integer> colorMap = new Hashtable<>();
+        fillColor(colorMap, size);
+        boolean[][] onGoalValue = new boolean[child.getBoard().length][child.getBoard().length];
+        boolean[][] onBoardValue = new boolean[child.getBoard().length][child.getBoard().length];
+        String[] colors;
+        if (child.getSize() == 3) {
+            colors = color3;
+        } else {
+            colors = color4;
+        }
         int sumMoves = 0;
-        for (int i = 0; i < child.getBoard().length; i++) {
-            for (int j = 0; j < child.getBoard().length; j++) {
-                if (!GameBoard.getGoal()[i][j].equals("_") && !GameBoard.getGoal()[i][j].equals(child.getBoard()[i][j])) {
-                    sumMoves += searchForClosest(child, i, j, GameBoard.getGoal()[i][j], trueValues);
-
-                } else if (GameBoard.getGoal()[i][j].equals(child.getBoard()[i][j]) && trueValues[i][j]) {
-                    sumMoves += searchForClosest(child, i, j, GameBoard.getGoal()[i][j], trueValues);
-                } else if (GameBoard.getGoal()[i][j].equals(child.getBoard()[i][j])) {
-                    trueValues[i][j] = true;
-                }
-
-
-            }
+        for (String color : colors) {
+            sumMoves += finishThisColorHeuristicValue(child, color, colorMap, onBoardValue, onGoalValue);
         }
         return sumMoves;
     }
 
-    private int searchForClosest(GameBoard child, int row, int column, String s, boolean[][] trueValues) {
-        int dx, dy, sum = Integer.MAX_VALUE, indexI = 0, indexJ = 0;
-        for (int i = 0; i < child.getBoard().length; i++) {
-            for (int j = 0; j < child.getBoard().length; j++) {
-                if (child.getBoard()[i][j].equals(s) && !trueValues[i][j]) {
-                    dx = Math.abs(row - i);
-                    dy = Math.abs(column - j);
-                    if (sum > dx + dy) {
-                        sum = dx + dy;
-                        indexI = i;
-                        indexJ = j;
+    private int finishThisColorHeuristicValue(GameBoard child, String s, Hashtable<String, Integer> colorMap, boolean[][] trueValues, boolean[][] onGoalValue) {
+        int min, sum = 0, boardI = 0, boardJ = 0, goalI = 0, goalJ = 0;
+        while (colorMap.get(s) > 0) {
+            min = Integer.MAX_VALUE;
+            for (int i = 0; i < child.getSize(); i++) {
+                for (int j = 0; j < child.getSize(); j++) {
+                    if (child.getBoard()[i][j].equals(s) && !trueValues[i][j]) {
+                        int[] tempMin = searchForClosest(child, i, j, s, trueValues, onGoalValue);
+                        if (tempMin[0] < min) {
+                            min = tempMin[0];
+                            goalI = tempMin[1];
+                            goalJ = tempMin[2];
+                            boardI = i;
+                            boardJ = j;
+                        }
                     }
                 }
-
             }
+            sum += min;
+            int count = colorMap.get(s);
+            trueValues[boardI][boardJ] = true;
+            onGoalValue[goalI][goalJ] = true;
+            colorMap.put(s, count - 1);
         }
-        trueValues[indexI][indexJ] = true;
         sum *= GameBoard.afterMoveValue(s);
         return sum;
+    }
+
+    private void fillColor(Hashtable<String, Integer> colorMap, int size) {
+        int counter = 0;
+        if (size == 3)
+            while (counter < size) {
+                if (counter == 0) {
+                    colorMap.put("R", 2);
+                } else if (counter == 1) {
+                    colorMap.put("B", 2);
+                } else {
+                    colorMap.put("G", 2);
+                }
+                counter++;
+            }
+        else {
+            while (counter < 4) {
+                if (counter == 0) {
+                    colorMap.put("R", 4);
+                } else if (counter == 1) {
+                    colorMap.put("B", 4);
+                } else if (counter == 2) {
+                    colorMap.put("G", 4);
+                } else {
+                    colorMap.put("Y", 4);
+                }
+                counter++;
+            }
+        }
+    }
+
+
+    private int[] searchForClosest(GameBoard child, int row, int column, String s, boolean[][] trueValues, boolean[][] onGoalValue) {
+        int[] ans = new int[3];
+        int dx, dy, sum = Integer.MAX_VALUE, indexI = 0, indexJ = 0;
+        for (Pair p : GameBoard.getMappedGoals().get(s)) {
+            if (!onGoalValue[p.getI()][p.getJ()]) {
+                dx = Math.abs(row - p.getI());
+                dy = Math.abs(column - p.getJ());
+                if (sum > dx + dy) {
+                    sum = dx + dy;
+                    indexI = p.getI();
+                    indexJ = p.getJ();
+
+                }
+            }
+
+        }
+        ans[0] = sum;
+        ans[1] = indexI;
+        ans[2] = indexJ;
+        return ans;
     }
 
 
@@ -307,11 +386,13 @@ public class Algorithms {
         int counter = 0;
         GameBoard firstState = null, secondState;
 
-        System.out.println("-------------------");
+        System.out.println("--------------------");
+        System.out.println("---PRINT-THE-PATH---");
+        System.out.println("--------------------");
         while (!path.isEmpty() && counter < 2) {
             if (counter == 0) {
                 path.peek().printState();
-                System.out.println("-----");
+//                System.out.println("-----");
                 firstState = path.pop();
 
                 counter++;
@@ -364,7 +445,6 @@ public class Algorithms {
     }
 
 
-
     private ArrayList<GameBoard> returnNewChildList(ArrayList<GameBoard> childList, int i) {
         ArrayList<GameBoard> tempGameBoardList = new ArrayList<>();
         for (int j = 0; j < i; j++) {
@@ -376,7 +456,8 @@ public class Algorithms {
 
     private void setChildHeuristicDistances(ArrayList<GameBoard> childList) {
         for (GameBoard child : childList) {
-            child.setChildAfterHeuristic(child.getStateValue() + heuristic(child));
+            int size = child.getSize();
+            child.setChildAfterHeuristic(child.getStateValue() + heuristic(child, size));
         }
     }
 }

@@ -10,7 +10,7 @@ public class Ex1 {
             path = "C:\\Users\\yosim\\IdeaProjects\\Ex1\\src\\input.txt";
         }
         long start = 0, end = 0;
-        GameInfo info = new GameInfo(path);// need to remmber to put here "input.txt"
+        GameInfo info = new GameInfo(path);// need to rememb er to put here "input.txt"
         GameBoard gb = new GameBoard(info);
         Algorithms a = new Algorithms();
 

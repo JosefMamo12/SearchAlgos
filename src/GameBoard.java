@@ -1,6 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+
+import java.util.*;
 
 public class GameBoard {
     private final String[][] board;
@@ -12,10 +11,15 @@ public class GameBoard {
     private static String[][] goal;
     private final int size;
 
-    public void setParent(GameBoard parent) {
-        this.parent = parent;
+    public static HashMap<String, LinkedList<Pair>> getMappedGoals() {
+        return mappedGoals;
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    private static HashMap<String, LinkedList<Pair>> mappedGoals;
     private GameBoard parent;
     private static boolean boardFlag = false;
     static long totalOpen = 0;
@@ -52,6 +56,7 @@ public class GameBoard {
 
 
     private void initializeBoard3Or5(String[][] mat) {
+        mappedGoals = new HashMap<>();
         String[][] temp;
         if (!boardFlag) {
             temp = board;
@@ -60,19 +65,44 @@ public class GameBoard {
         }
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat.length; j++) {
-                if ("R".equals(mat[i][j]))
+                if ("R".equals(mat[i][j])) {
                     temp[i][j] = mat[i][j];
-                else if ("Y".equals(mat[i][j]))
+                    if (boardFlag && !mappedGoals.containsKey("R")) {
+                        mappedGoals.put("R", new LinkedList<>());
+                        mappedGoals.get("R").add(new Pair(i, j));
+                    } else if (boardFlag) {
+                        mappedGoals.get("R").add(new Pair(i, j));
+                    }
+                } else if ("Y".equals(mat[i][j])) {
                     temp[i][j] = mat[i][j];
-                else if ("B".equals(mat[i][j]))
+                    if (boardFlag && !mappedGoals.containsKey("Y")) {
+                        mappedGoals.put("Y", new LinkedList<>());
+                        mappedGoals.get("Y").add(new Pair(i, j));
+                    } else if (boardFlag) {
+                        mappedGoals.get("Y").add(new Pair(i, j));
+                    }
+                } else if ("B".equals(mat[i][j])) {
                     temp[i][j] = mat[i][j];
-                else if ("G".equals(mat[i][j]))
+                    if (boardFlag && !mappedGoals.containsKey("B")) {
+                        mappedGoals.put("B", new LinkedList<>());
+                        mappedGoals.get("B").add(new Pair(i, j));
+                    } else if (boardFlag) {
+                        mappedGoals.get("B").add(new Pair(i, j));
+                    }
+                } else if ("G".equals(mat[i][j])) {
                     temp[i][j] = mat[i][j];
-                else
+                    if (boardFlag && !mappedGoals.containsKey("G")) {
+                        mappedGoals.put("G", new LinkedList<>());
+                        mappedGoals.get("G").add(new Pair(i, j));
+                    } else if (boardFlag) {
+                        mappedGoals.get("G").add(new Pair(i, j));
+                    }
+                } else
                     temp[i][j] = mat[i][j];
             }
         }
         boardFlag = true;
+        totalOpen++;
     }
 
     public ArrayList<GameBoard> expandMove() {
@@ -80,10 +110,11 @@ public class GameBoard {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (board[i][j].equals("_")) {
-                    moveUp(i, j, gb);
-                    moveDown(i, j, gb);
                     moveLeft(i, j, gb);
                     moveRight(i, j, gb);
+                    moveUp(i, j, gb);
+                    moveDown(i, j, gb);
+
                 }
             }
         }
@@ -229,6 +260,10 @@ public class GameBoard {
             }
             System.out.println();
         }
+        if (size == 3)
+            System.out.println("----");
+        else
+            System.out.println("-------");
 
     }
 
@@ -250,10 +285,6 @@ public class GameBoard {
 
     public int getStateValue() {
         return stateValue;
-    }
-
-    public void setStateValue(int value) {
-        stateValue += value;
     }
 
     public void setChildAfterHeuristic(int heuristic) {

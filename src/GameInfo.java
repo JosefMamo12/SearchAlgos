@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -32,11 +33,17 @@ public class GameInfo {
                 } else if (index == 2) {
                     sizeOfBoard = sc.nextLine();
                     if (sizeOfBoard.equals("small")) {
+//                        init = new char[3][3];
+//                        goal = new char[3][3];
                         init = new String[3][3];
                         goal = new String[3][3];
                         while (insider < 7) {
                             while (insider <= 2) {
                                 init[rowCounter] = sc.nextLine().split(",");
+//                                String[] sr = sc.nextLine().split(",");
+//                                for (int i = 0; i < sr.length; i++) {
+//                                    init[rowCounter][i] = sr[i].charAt(0);
+//                                }
                                 rowCounter++;
                                 insider++;
                             }
@@ -47,6 +54,10 @@ public class GameInfo {
                             }
                             while (insider >= 4 && insider <= 6) {
                                 goal[rowCounter] = sc.nextLine().split(",");
+//                                String[] sr = sc.nextLine().split(",");
+//                                for (int i = 0; i < sr.length; i++) {
+//                                    goal[rowCounter][i] = sr[i].charAt(0);
+//                                }
                                 rowCounter++;
                                 insider++;
                             }
@@ -57,6 +68,10 @@ public class GameInfo {
                         while (insider < 11) {
                             while (insider <= 4) {
                                 init[rowCounter] = sc.nextLine().split(",");
+//                                String[] sr = sc.nextLine().split(",");
+//                                for (int i = 0; i < sr.length; i++) {
+//                                    init[rowCounter][i] = sr[i].charAt(0);
+//                                }
                                 rowCounter++;
                                 insider++;
                             }
@@ -67,6 +82,10 @@ public class GameInfo {
                             }
                             while (insider >= 6 && insider <= 10) {
                                 goal[rowCounter] = sc.nextLine().split(",");
+//                                String[] sr = sc.nextLine().split(",");
+//                                for (int i = 0; i < sr.length; i++) {
+//                                    goal[rowCounter][i] = sr[i].charAt(0);
+//                                }
                                 rowCounter++;
                                 insider++;
                             }
