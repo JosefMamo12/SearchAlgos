@@ -4,10 +4,6 @@ import java.util.*;
 public class GameBoard {
     private final String[][] board;
 
-    public static String[][] getGoal() {
-        return goal;
-    }
-
     private static String[][] goal;
     private final int size;
 
@@ -50,10 +46,7 @@ public class GameBoard {
     public GameBoard(String[][] board) {
         this.board = board;
         this.size = board.length;
-
-
     }
-
 
     private void initializeBoard3Or5(String[][] mat) {
         mappedGoals = new HashMap<>();
@@ -124,9 +117,7 @@ public class GameBoard {
 
     private void moveRight(int row, int column, ArrayList<GameBoard> gb) {
         if (column + 1 < size && !board[row][column + 1].equals("_")) {
-//            if (this.parent != null && !parent.board[row][column].equals("_") && parent.board[row][column].equals(board[row][column + 1])) {
-//                return;
-//            }
+
             String[][] nextState = new String[size][size];
             copyState(nextState);
 
@@ -134,17 +125,13 @@ public class GameBoard {
             String temp = nextState[row][column + 1];
             nextState[row][column + 1] = nextState[row][column];
             createChild(row, column, nextState, temp, gb);
-//            System.out.println(totalOpen + " Right");
-//            child.printState();
         }
 
     }
 
     private void moveLeft(int row, int column, ArrayList<GameBoard> gb) {
         if (column - 1 >= 0 && !board[row][column - 1].equals("_")) {
-//            if (this.parent != null && !parent.board[row][column].equals("_") && parent.board[row][column].equals(board[row][column - 1])) {
-//                return;
-//            }
+
             String[][] nextState = new String[size][size];
             copyState(nextState);
 
@@ -152,17 +139,13 @@ public class GameBoard {
             String temp = nextState[row][column - 1];
             nextState[row][column - 1] = nextState[row][column];
             createChild(row, column, nextState, temp, gb);
-//            System.out.println(totalOpen + " Left");
-//            child.printState();
         }
 
     }
 
     private void moveUp(int row, int column, ArrayList<GameBoard> gb) {
         if (row - 1 >= 0 && !board[row - 1][column].equals("_")) {
-//            if (this.parent != null && !parent.board[row][column].equals("_") && parent.board[row][column].equals(board[row - 1][column])) {
-//                return;
-//            }
+
             String[][] nextState = new String[size][size];
             copyState(nextState);
 
@@ -170,8 +153,7 @@ public class GameBoard {
             String temp = nextState[row - 1][column];
             nextState[row - 1][column] = nextState[row][column];
             createChild(row, column, nextState, temp, gb);
-//            System.out.println(totalOpen + " Up");
-//            child.printState();
+
         }
 
     }
@@ -179,9 +161,7 @@ public class GameBoard {
 
     private void moveDown(int row, int column, ArrayList<GameBoard> gb) {
         if (row + 1 < size && !board[row + 1][column].equals("_")) {
-//            if (this.parent != null && !parent.board[row][column].equals("_") && parent.board[row][column].equals(board[row + 1][column])) {
-//                return;
-//            }
+
             String[][] nextState = new String[size][size];
             copyState(nextState);
 
@@ -189,8 +169,6 @@ public class GameBoard {
             String temp = nextState[row + 1][column];
             nextState[row + 1][column] = nextState[row][column];
             createChild(row, column, nextState, temp, gb);
-//            System.out.println(totalOpen + " Down");
-//            child.printState();
         }
 
     }
@@ -252,6 +230,7 @@ public class GameBoard {
     public int hashCode() {
         return Arrays.deepHashCode(board);
     }
+
 
     public void printState() {
         for (int i = 0; i < size; i++) {

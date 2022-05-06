@@ -14,8 +14,8 @@ public class Algorithms {
     private String num = "";
     private String cost = "inf";
     private int valueAdder = 0;
-    private static String[] color3 = new String[]{"R", "B", "G"};
-    private static String[] color4 = new String[]{"R", "B", "G", "Y"};
+    private static final String[] color3 = new String[]{"R", "B", "G"};
+    private static final String[] color4 = new String[]{"R", "B", "G", "Y"};
     private final Stack<GameBoard> path = new Stack<>();
 
     public void bfs(GameBoard root) {
@@ -67,7 +67,8 @@ public class Algorithms {
             System.out.println(depth);
             HashSet<GameBoard> loopAvoidance = new HashSet<>();
             GameBoard result = limitedDFS(root, depth, loopAvoidance);
-            printFroniter(loopAvoidance);
+            if (isOpen)
+                printFrontier(loopAvoidance);
             if (result.getInfo() != 1) {
                 return;
             }
@@ -76,7 +77,7 @@ public class Algorithms {
     }
 
     /**
-     * Recursivly function thats combine between dfs to a bfs to avoid the problem of the space thats exists in bfs when
+     * Recursively function that's combine between dfs to a bfs to avoid the problem of the space that's exists in bfs when
      * we not save all the states just the states that we work on.
      */
     private GameBoard limitedDFS(GameBoard curr, int depth, HashSet<GameBoard> loopAvoidance) {
@@ -112,7 +113,7 @@ public class Algorithms {
         }
     }
 
-    private void printFroniter(HashSet<GameBoard> loopAvoidance) {
+    private void printFrontier(HashSet<GameBoard> loopAvoidance) {
         for (GameBoard gb : loopAvoidance) {
             gb.printState();
         }
@@ -152,8 +153,7 @@ public class Algorithms {
                     entry.getKey().printState();
                     System.out.println("-----");
                 }
-                System.out.println();
-                System.out.println("Next Layer");
+
             }
 
         }
@@ -225,18 +225,16 @@ public class Algorithms {
         loopAvoidance.put(root, root);
         while (!st.isEmpty()) {
             GameBoard curr = st.pop();
+            curr.printState();
             if (curr.getInfo() == 1) {
                 loopAvoidance.remove(curr);
             } else {
                 curr.setInfo(1); /* Mark as out */
                 st.add(curr);  /* Reload the stuck with the following current node as marked out to know the path we at right now  */
                 childList = curr.expandMove();/* Return all the possible movements as list */
-//                System.out.println("Size: " + childList.size() + " Open List:");
-//
-//                childList.forEach(GameBoard::printState);
                 setChildHeuristicDistances(childList);
                 childList.sort(new GameBoard.GameBoardComparator());
-                for (int i = 0; i < childList.size(); i++) {
+                for (int i = childList.size() - 1; i >= 0; i--) {
                     GameBoard child = childList.get(i);
                     if (child.getChildAfterHeuristic() >= t) {
                         childList = returnNewChildList(childList, i);
@@ -250,6 +248,7 @@ public class Algorithms {
                             loopAvoidance.remove(child);
                         }
                     } else if (child.isGoal()) {
+                        System.out.println(t);
                         t = child.getChildAfterHeuristic();
                         result = child;
                         childList = returnNewChildList(childList, i);
@@ -269,7 +268,11 @@ public class Algorithms {
         }
     }
 
-
+    /**
+     * My heuristic method works base on manhattan distances by calculating the distances vector of each two pair of colors between the current board
+     * to the goal board and return the smallest distances.
+     * I Iterate over each color until  finishing calculate all the distances of the specific color.
+     */
     private int heuristic(GameBoard child, int size) {
         Hashtable<String, Integer> colorMap = new Hashtable<>();
         fillColor(colorMap, size);
@@ -295,7 +298,7 @@ public class Algorithms {
             for (int i = 0; i < child.getSize(); i++) {
                 for (int j = 0; j < child.getSize(); j++) {
                     if (child.getBoard()[i][j].equals(s) && !trueValues[i][j]) {
-                        int[] tempMin = searchForClosest(child, i, j, s, trueValues, onGoalValue);
+                        int[] tempMin = searchForClosestGoal(i, j, s, onGoalValue);
                         if (tempMin[0] < min) {
                             min = tempMin[0];
                             goalI = tempMin[1];
@@ -316,6 +319,9 @@ public class Algorithms {
         return sum;
     }
 
+    /**
+     * Function to fill the hashmap that counting how many colors have been counted.
+     */
     private void fillColor(Hashtable<String, Integer> colorMap, int size) {
         int counter = 0;
         if (size == 3)
@@ -345,8 +351,15 @@ public class Algorithms {
         }
     }
 
-
-    private int[] searchForClosest(GameBoard child, int row, int column, String s, boolean[][] trueValues, boolean[][] onGoalValue) {
+    /**
+     * Iterate over the goal indexes and calculate the distances between the board .
+     * @param row - Index of board row coordinate.
+     * @param column - Index of board column coordinate.
+     * @param s - Specific color.
+     * @param onGoalValue - Boolean array that's sign if I have been visited already at this goal coordinates.
+     * @return sum, IndexI, IndexJ
+     */
+    private int[] searchForClosestGoal(int row, int column, String s, boolean[][] onGoalValue) {
         int[] ans = new int[3];
         int dx, dy, sum = Integer.MAX_VALUE, indexI = 0, indexJ = 0;
         for (Pair p : GameBoard.getMappedGoals().get(s)) {
@@ -392,7 +405,6 @@ public class Algorithms {
         while (!path.isEmpty() && counter < 2) {
             if (counter == 0) {
                 path.peek().printState();
-//                System.out.println("-----");
                 firstState = path.pop();
 
                 counter++;
@@ -440,9 +452,6 @@ public class Algorithms {
         return cost;
     }
 
-    public int getValueAdder() {
-        return valueAdder;
-    }
 
 
     private ArrayList<GameBoard> returnNewChildList(ArrayList<GameBoard> childList, int i) {
