@@ -18,6 +18,12 @@ public class Algorithms {
     private static final String[] color4 = new String[]{"R", "B", "G", "Y"};
     private final Stack<GameBoard> path = new Stack<>();
 
+    /**
+     * The breadth first search algorithm to find the minimal steps to get from root board to get to the goal board
+     * by using queue, that's the order of the expansion from the root after it all his neighbors etc...
+     *
+     * @param root - Starting board
+     */
     public void bfs(GameBoard root) {
         isOpen = root.isOpen();
         GameBoard poopedOne;
@@ -26,8 +32,7 @@ public class Algorithms {
         HashSet<GameBoard> closedList = new HashSet<>();
         openList.add(root);
         openListHash.add(root);
-        boolean isSolution = false;
-        while (!openList.isEmpty() && !isSolution) {
+        while (!openList.isEmpty()) {
             GameBoard currBoard = openList.poll();
             poopedOne = currBoard;
             openListHash.remove(currBoard);
@@ -55,20 +60,16 @@ public class Algorithms {
                 System.out.println();
             }
         }
-        if (!isSolution) {
-            outputPath += "no path";
+        outputPath += "no path";
+        num = Long.toString(GameBoard.totalOpen);
 
-        }
+
     }
 
     public void dfid(GameBoard root) {
-        isOpen = root.isOpen();
         for (int depth = 1; depth < Integer.MAX_VALUE; depth++) {
-            System.out.println(depth);
-            HashSet<GameBoard> loopAvoidance = new HashSet<>();
+            Hashtable<GameBoard, GameBoard> loopAvoidance = new Hashtable<>();
             GameBoard result = limitedDFS(root, depth, loopAvoidance);
-            if (isOpen)
-                printFrontier(loopAvoidance);
             if (result.getInfo() != 1) {
                 return;
             }
@@ -80,21 +81,22 @@ public class Algorithms {
      * Recursively function that's combine between dfs to a bfs to avoid the problem of the space that's exists in bfs when
      * we not save all the states just the states that we work on.
      */
-    private GameBoard limitedDFS(GameBoard curr, int depth, HashSet<GameBoard> loopAvoidance) {
+    private GameBoard limitedDFS(GameBoard curr, int depth, Hashtable<GameBoard, GameBoard> loopAvoidance) {
         /* 0 = False, 1 = True, 2 = Fail */
         GameBoard cutoff = new GameBoard(curr.getBoard());
         cutoff.setInfo(1);
+
         if (curr.isGoal()) {
             buildAnswer(curr);
             return curr;
         } else if (depth == 0) {
             return cutoff;
         } else {
-            loopAvoidance.add(curr);
+            loopAvoidance.put(curr, curr);
             cutoff.setInfo(0);
             for (GameBoard child : curr.expandMove()) {
                 if (loopAvoidance.contains(child)) continue;
-                GameBoard result = limitedDFS(child, depth - 1, loopAvoidance);
+                GameBoard result = limitedDFS(child, depth - 1, loopAvoidance); /* Recursion step go inside to the next successor */
                 if (result.getInfo() == 1) {
                     cutoff.setInfo(1);
                 } else if (result.getInfo() != 2) {
@@ -102,6 +104,7 @@ public class Algorithms {
 
                 }
             }
+            printFrontier(loopAvoidance);
             loopAvoidance.remove(curr);
             if (cutoff.getInfo() == 1) {
             } else {
@@ -113,9 +116,11 @@ public class Algorithms {
         }
     }
 
-    private void printFrontier(HashSet<GameBoard> loopAvoidance) {
-        for (GameBoard gb : loopAvoidance) {
-            gb.printState();
+    private void printFrontier(Hashtable<GameBoard, GameBoard> loopAvoidance) {
+        System.out.println("Open list:");
+        for (Map.Entry<GameBoard, GameBoard> entry : loopAvoidance.entrySet()) {
+            if (entry.getKey().getInfo() == 0)
+                entry.getKey().printState();
         }
     }
 
@@ -123,6 +128,7 @@ public class Algorithms {
     public void aStar(GameBoard root) {
         isOpen = root.isOpen();
         int size = root.getSize();
+        GameBoard poopedOne;
         PriorityQueue<GameBoard> openListQueue = new PriorityQueue<>(new GameBoard.GameBoardComparator());
         Hashtable<GameBoard, GameBoard> openListHash = new Hashtable<>();
         HashSet<GameBoard> closedList = new HashSet<>();
@@ -130,6 +136,7 @@ public class Algorithms {
         openListHash.put(root, root);
         while (!openListQueue.isEmpty()) {
             GameBoard curr = openListQueue.poll();
+            poopedOne = curr;
             openListHash.remove(curr);
             closedList.add(curr);
             if (curr.isGoal()) {
@@ -149,23 +156,20 @@ public class Algorithms {
                 }
             }
             if (isOpen) {
-                for (Map.Entry<GameBoard, GameBoard> entry : openListHash.entrySet()) {
-                    entry.getKey().printState();
-                    System.out.println("-----");
-                }
-
+                System.out.println("Now pooped:");
+                poopedOne.printState();
+                printFrontier(openListHash);
             }
-
         }
-
-
         outputPath += "no path";
         num = Long.toString(GameBoard.totalOpen);
 
     }
 
     public void idaStar(GameBoard root) {
+        isOpen = root.isOpen();
         Stack<GameBoard> openListStack = new Stack<>();
+        GameBoard poopedOne;
         Hashtable<GameBoard, GameBoard> loopAvoidance = new Hashtable<>();
         int size = root.getSize();
         int maxH = heuristic(root, size);
@@ -175,6 +179,7 @@ public class Algorithms {
             loopAvoidance.put(root, root);
             while (!openListStack.isEmpty()) {
                 GameBoard curr = openListStack.pop();
+                poopedOne = curr;
                 if (curr.getInfo() == 1) {  /*means marked 'out'*/
                     loopAvoidance.remove(curr);
                 } else {
@@ -205,15 +210,24 @@ public class Algorithms {
                         loopAvoidance.put(child, child);
                     }
                 }
-
+                if (isOpen) {
+                    System.out.println("Now pooped:");
+                    poopedOne.printState();
+                    printFrontier(loopAvoidance);
+                }
             }
             root.setInfo(0);
             maxH = minF;
 
         }
+        outputPath += "no path";
+        num = Long.toString(GameBoard.totalOpen);
+
     }
 
     public void dfbnb(GameBoard root) {
+        isOpen = root.isOpen();
+        GameBoard poopedOne;
         int size = root.getSize();
         Stack<GameBoard> st = new Stack<>();
         ArrayList<GameBoard> childList = new ArrayList<>();
@@ -225,7 +239,7 @@ public class Algorithms {
         loopAvoidance.put(root, root);
         while (!st.isEmpty()) {
             GameBoard curr = st.pop();
-            curr.printState();
+            poopedOne = curr;
             if (curr.getInfo() == 1) {
                 loopAvoidance.remove(curr);
             } else {
@@ -262,9 +276,18 @@ public class Algorithms {
                 loopAvoidance.put(childList.get(i), childList.get(i));
 
             }
+            if (isOpen) {
+                System.out.println("Now pooped:");
+                poopedOne.printState();
+                printFrontier(loopAvoidance);
+            }
         }
         if (result != null) {
             buildAnswer(result);
+        }
+        else{
+            outputPath += "no path";
+            num = Long.toString(GameBoard.totalOpen);
         }
     }
 
@@ -353,9 +376,10 @@ public class Algorithms {
 
     /**
      * Iterate over the goal indexes and calculate the distances between the board .
-     * @param row - Index of board row coordinate.
-     * @param column - Index of board column coordinate.
-     * @param s - Specific color.
+     *
+     * @param row         - Index of board row coordinate.
+     * @param column      - Index of board column coordinate.
+     * @param s           - Specific color.
      * @param onGoalValue - Boolean array that's sign if I have been visited already at this goal coordinates.
      * @return sum, IndexI, IndexJ
      */
@@ -451,7 +475,6 @@ public class Algorithms {
     public String getCost() {
         return cost;
     }
-
 
 
     private ArrayList<GameBoard> returnNewChildList(ArrayList<GameBoard> childList, int i) {

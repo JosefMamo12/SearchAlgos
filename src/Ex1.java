@@ -10,7 +10,7 @@ public class Ex1 {
         if (args.length > 0)
             path = args[0];
         else {
-            path = "C:\\Users\\yosim\\IdeaProjects\\Ex1\\src\\input7.txt";
+            path = "C:\\Users\\yosim\\IdeaProjects\\Ex1\\src\\input6.txt";
         }
         long start = 0, end = 0;
         GameInfo info = new GameInfo(path);
