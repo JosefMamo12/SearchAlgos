@@ -6,14 +6,9 @@ import java.io.IOException;
  */
 public class Ex1 {
     public static void main(String[] args) {
-        String path;
-        if (args.length > 0)
-            path = args[0];
-        else {
-            path = "C:\\Users\\yosim\\IdeaProjects\\Ex1\\src\\input6.txt";
-        }
+
         long start = 0, end = 0;
-        GameInfo info = new GameInfo(path);
+        GameInfo info = new GameInfo("src/input.txt");
         GameBoard gb = new GameBoard(info);
         Algorithms a = new Algorithms();
 

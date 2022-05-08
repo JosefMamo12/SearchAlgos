@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -12,8 +11,10 @@ public class GameInfo {
     private String sizeOfBoard;
     private String algo;
     private boolean noOpen;
-    private String[][] init;
-    private String[][] goal;
+    private char[][] init;
+    private char[][] goal;
+//    private String[][] init;
+//    private String[][] goal;
 
     public GameInfo(String path) {
         File f = new File(path);
@@ -33,17 +34,17 @@ public class GameInfo {
                 } else if (index == 2) {
                     sizeOfBoard = sc.nextLine();
                     if (sizeOfBoard.equals("small")) {
-//                        init = new char[3][3];
-//                        goal = new char[3][3];
-                        init = new String[3][3];
-                        goal = new String[3][3];
+                        init = new char[3][3];
+                        goal = new char[3][3];
+//                        init = new String[3][3];
+//                        goal = new String[3][3];
                         while (insider < 7) {
                             while (insider <= 2) {
-                                init[rowCounter] = sc.nextLine().split(",");
-//                                String[] sr = sc.nextLine().split(",");
-//                                for (int i = 0; i < sr.length; i++) {
-//                                    init[rowCounter][i] = sr[i].charAt(0);
-//                                }
+//                                init[rowCounter] = sc.nextLine().split(",");
+                                String[] sr = sc.nextLine().split(",");
+                                for (int i = 0; i < sr.length; i++) {
+                                    init[rowCounter][i] = sr[i].charAt(0);
+                                }
                                 rowCounter++;
                                 insider++;
                             }
@@ -53,39 +54,43 @@ public class GameInfo {
                                 insider++;
                             }
                             while (insider >= 4 && insider <= 6) {
-                                goal[rowCounter] = sc.nextLine().split(",");
-//                                String[] sr = sc.nextLine().split(",");
-//                                for (int i = 0; i < sr.length; i++) {
-//                                    goal[rowCounter][i] = sr[i].charAt(0);
-//                                }
+//                                goal[rowCounter] = sc.nextLine().split(",");
+                                String[] sr = sc.nextLine().split(",");
+                                for (int i = 0; i < sr.length; i++) {
+                                    goal[rowCounter][i] = sr[i].charAt(0);
+                                }
                                 rowCounter++;
                                 insider++;
                             }
                         }
                     } else {
-                        init = new String[5][5];
-                        goal = new String[5][5];
+                        init = new char[5][5];
+                        goal = new char[5][5];
                         while (insider < 11) {
                             while (insider <= 4) {
-                                init[rowCounter] = sc.nextLine().split(",");
-//                                String[] sr = sc.nextLine().split(",");
-//                                for (int i = 0; i < sr.length; i++) {
-//                                    init[rowCounter][i] = sr[i].charAt(0);
+//                                init[rowCounter] = sc.nextLine().split(",");
+                                String[] sr = sc.nextLine().split(",");
+                                for (int i = 0; i < sr.length; i++) {
+                                    init[rowCounter][i] = sr[i].charAt(0);
 //                                }
+
+
+                                }
                                 rowCounter++;
                                 insider++;
+                                if (insider == 5) {
+                                    rowCounter = 0;
+                                    sc.nextLine();
+                                    insider++;
+                                }
                             }
-                            if (insider == 5) {
-                                rowCounter = 0;
-                                sc.nextLine();
-                                insider++;
-                            }
+
                             while (insider >= 6 && insider <= 10) {
-                                goal[rowCounter] = sc.nextLine().split(",");
-//                                String[] sr = sc.nextLine().split(",");
-//                                for (int i = 0; i < sr.length; i++) {
-//                                    goal[rowCounter][i] = sr[i].charAt(0);
-//                                }
+//                                goal[rowCounter] = sc.nextLine().split(",");
+                                String[] sr = sc.nextLine().split(",");
+                                for (int i = 0; i < sr.length; i++) {
+                                    goal[rowCounter][i] = sr[i].charAt(0);
+                                }
                                 rowCounter++;
                                 insider++;
                             }
@@ -96,14 +101,12 @@ public class GameInfo {
                 }
 
             }
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public String getSizeOfBoard() {
-        return sizeOfBoard;
-    }
 
     public String getAlgo() {
         return algo;
@@ -113,11 +116,11 @@ public class GameInfo {
         return noOpen;
     }
 
-    public String[][] getInit() {
+    public char[][] getInit() {
         return init;
     }
 
-    public String[][] getGoal() {
+    public char[][] getGoal() {
         return goal;
     }
 }

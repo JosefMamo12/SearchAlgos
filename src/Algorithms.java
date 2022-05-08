@@ -13,9 +13,9 @@ public class Algorithms {
     private String outputPath = "";
     private String num = "";
     private String cost = "inf";
-    private int valueAdder = 0;
-    private static final String[] color3 = new String[]{"R", "B", "G"};
-    private static final String[] color4 = new String[]{"R", "B", "G", "Y"};
+    private final int valueAdder = 0;
+    private static final char[] color3 = new char[]{'R', 'B', 'G'};
+    private static final char[] color4 = new char[]{'R', 'B', 'G', 'Y'};
     private final Stack<GameBoard> path = new Stack<>();
 
     /**
@@ -28,19 +28,19 @@ public class Algorithms {
         isOpen = root.isOpen();
         GameBoard poopedOne;
         Queue<GameBoard> openList = new LinkedList<>();
-        HashSet<GameBoard> openListHash = new HashSet<>();
-        HashSet<GameBoard> closedList = new HashSet<>();
+        Hashtable<GameBoard, GameBoard> openListHash = new Hashtable<>();
+        Hashtable<GameBoard, GameBoard> closedList = new Hashtable<>();
         openList.add(root);
-        openListHash.add(root);
+        openListHash.put(root, root);
         while (!openList.isEmpty()) {
             GameBoard currBoard = openList.poll();
             poopedOne = currBoard;
             openListHash.remove(currBoard);
-            closedList.add(currBoard);
+            closedList.put(currBoard, currBoard);
             for (GameBoard child : currBoard.expandMove()) {
-                if (!openListHash.contains(child) && !closedList.contains(child)) {
+                if (!openListHash.containsKey(child) && !closedList.containsKey(child)) {
                     openList.add(child);
-                    openListHash.add(child);
+                    openListHash.put(child, child);
                 }
                 if (child.isGoal()) {
                     buildAnswer(child);
@@ -53,11 +53,7 @@ public class Algorithms {
             if (isOpen) {
                 System.out.println("Now pooped:");
                 poopedOne.printState();
-                System.out.println("Open List: ");
-                for (GameBoard entry : openListHash) {
-                    entry.printState();
-                }
-                System.out.println();
+                printFrontier(openListHash);
             }
         }
         outputPath += "no path";
@@ -104,7 +100,6 @@ public class Algorithms {
 
                 }
             }
-            printFrontier(loopAvoidance);
             loopAvoidance.remove(curr);
             if (cutoff.getInfo() == 1) {
             } else {
@@ -262,7 +257,6 @@ public class Algorithms {
                             loopAvoidance.remove(child);
                         }
                     } else if (child.isGoal()) {
-                        System.out.println(t);
                         t = child.getChildAfterHeuristic();
                         result = child;
                         childList = returnNewChildList(childList, i);
@@ -284,8 +278,7 @@ public class Algorithms {
         }
         if (result != null) {
             buildAnswer(result);
-        }
-        else{
+        } else {
             outputPath += "no path";
             num = Long.toString(GameBoard.totalOpen);
         }
@@ -297,40 +290,42 @@ public class Algorithms {
      * I Iterate over each color until  finishing calculate all the distances of the specific color.
      */
     private int heuristic(GameBoard child, int size) {
-        Hashtable<String, Integer> colorMap = new Hashtable<>();
+        Hashtable<Character, Integer> colorMap = new Hashtable<>();
         fillColor(colorMap, size);
         boolean[][] onGoalValue = new boolean[child.getBoard().length][child.getBoard().length];
         boolean[][] onBoardValue = new boolean[child.getBoard().length][child.getBoard().length];
-        String[] colors;
+        char[] colors;
         if (child.getSize() == 3) {
             colors = color3;
         } else {
             colors = color4;
         }
         int sumMoves = 0;
-        for (String color : colors) {
+        for (char color : colors) {
             sumMoves += finishThisColorHeuristicValue(child, color, colorMap, onBoardValue, onGoalValue);
         }
         return sumMoves;
     }
 
-    private int finishThisColorHeuristicValue(GameBoard child, String s, Hashtable<String, Integer> colorMap, boolean[][] trueValues, boolean[][] onGoalValue) {
+    private int finishThisColorHeuristicValue(GameBoard child, char s, Hashtable<Character, Integer> colorMap, boolean[][] trueValues, boolean[][] onGoalValue) {
         int min, sum = 0, boardI = 0, boardJ = 0, goalI = 0, goalJ = 0;
         while (colorMap.get(s) > 0) {
             min = Integer.MAX_VALUE;
-            for (int i = 0; i < child.getSize(); i++) {
-                for (int j = 0; j < child.getSize(); j++) {
-                    if (child.getBoard()[i][j].equals(s) && !trueValues[i][j]) {
-                        int[] tempMin = searchForClosestGoal(i, j, s, onGoalValue);
-                        if (tempMin[0] < min) {
-                            min = tempMin[0];
-                            goalI = tempMin[1];
-                            goalJ = tempMin[2];
-                            boardI = i;
-                            boardJ = j;
-                        }
+//            for (int i = 0; i < child.getSize(); i++) {
+//                for (int j = 0; j < child.getSize(); j++) {
+//                    if (child.getBoard()[i][j] == s && !trueValues[i][j]) {
+            for (Pair p : child.getMappedBoard().get(s)) {
+                if (!trueValues[p.getI()][p.getJ()]) {
+                    int[] tempMin = searchForClosestGoal(p.getI(), p.getJ(), s, onGoalValue);
+                    if (tempMin[0] < min) {
+                        min = tempMin[0];
+                        goalI = tempMin[1];
+                        goalJ = tempMin[2];
+                        boardI = p.getI();
+                        boardJ = p.getJ();
                     }
                 }
+
             }
             sum += min;
             int count = colorMap.get(s);
@@ -345,29 +340,29 @@ public class Algorithms {
     /**
      * Function to fill the hashmap that counting how many colors have been counted.
      */
-    private void fillColor(Hashtable<String, Integer> colorMap, int size) {
+    private void fillColor(Hashtable<Character, Integer> colorMap, int size) {
         int counter = 0;
         if (size == 3)
             while (counter < size) {
                 if (counter == 0) {
-                    colorMap.put("R", 2);
+                    colorMap.put('R', 2);
                 } else if (counter == 1) {
-                    colorMap.put("B", 2);
+                    colorMap.put('B', 2);
                 } else {
-                    colorMap.put("G", 2);
+                    colorMap.put('G', 2);
                 }
                 counter++;
             }
         else {
             while (counter < 4) {
                 if (counter == 0) {
-                    colorMap.put("R", 4);
+                    colorMap.put('R', 4);
                 } else if (counter == 1) {
-                    colorMap.put("B", 4);
+                    colorMap.put('B', 4);
                 } else if (counter == 2) {
-                    colorMap.put("G", 4);
+                    colorMap.put('G', 4);
                 } else {
-                    colorMap.put("Y", 4);
+                    colorMap.put('Y', 4);
                 }
                 counter++;
             }
@@ -383,7 +378,7 @@ public class Algorithms {
      * @param onGoalValue - Boolean array that's sign if I have been visited already at this goal coordinates.
      * @return sum, IndexI, IndexJ
      */
-    private int[] searchForClosestGoal(int row, int column, String s, boolean[][] onGoalValue) {
+    private int[] searchForClosestGoal(int row, int column, char s, boolean[][] onGoalValue) {
         int[] ans = new int[3];
         int dx, dy, sum = Integer.MAX_VALUE, indexI = 0, indexJ = 0;
         for (Pair p : GameBoard.getMappedGoals().get(s)) {
@@ -407,28 +402,28 @@ public class Algorithms {
 
 
     private void buildAnswer(GameBoard curr) {
+        cost = Integer.toString(curr.getStateValue());
         while (curr.getParent() != null) {
             path.add(curr);
-            num = Long.toString(GameBoard.totalOpen);
             curr = curr.getParent();
         }
         path.add(curr);
-        printPathWell2(path);
-        cost = Integer.toString(valueAdder);
+        buildPathWell2(path);
+        num = Long.toString(GameBoard.totalOpen);
 
     }
 
 
-    private void printPathWell2(Stack<GameBoard> path) {
+    private void buildPathWell2(Stack<GameBoard> path) {
         int counter = 0;
         GameBoard firstState = null, secondState;
 
-        System.out.println("--------------------");
-        System.out.println("---PRINT-THE-PATH---");
-        System.out.println("--------------------");
+//        System.out.println("--------------------");
+//        System.out.println("---PRINT-THE-PATH---");
+//        System.out.println("--------------------");
         while (!path.isEmpty() && counter < 2) {
             if (counter == 0) {
-                path.peek().printState();
+//                path.peek().printState();
                 firstState = path.pop();
 
                 counter++;
@@ -445,14 +440,14 @@ public class Algorithms {
         String firstString = "";
         for (int i = 0; i < firstState.getBoard().length; i++) {
             for (int j = 0; j < firstState.getBoard().length; j++) {
-                if (!firstState.getBoard()[i][j].equals(secondState.getBoard()[i][j])) {
-                    if (firstState.getBoard()[i][j].equals("_")) {
+                if (firstState.getBoard()[i][j] != secondState.getBoard()[i][j]) {
+                    if (firstState.getBoard()[i][j] == '_') {
                         if (!secondState.isGoal()) {
                             secondString = secondState.getBoard()[i][j] + ":(" + (i + 1) + "," + (j + 1) + ")--";
                         } else {
                             secondString = secondState.getBoard()[i][j] + ":(" + (i + 1) + "," + (j + 1) + ")";
                         }
-                        valueAdder += GameBoard.afterMoveValue(secondState.getBoard()[i][j]);
+//                        valueAdder += GameBoard.afterMoveValue(secondState.getBoard()[i][j]);
                     } else {
                         firstString = "(" + (i + 1) + "," + (j + 1) + "):";
                     }

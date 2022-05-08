@@ -1,21 +1,13 @@
 
+
 import java.util.*;
 
-public class GameBoard {
-    private final String[][] board;
-
-    private static String[][] goal;
+public class GameBoard  {
+    //    private final String[][] board;
+    private final char[][] board;
+    //    private static String[][] goal;
     private final int size;
-
-    public static HashMap<String, LinkedList<Pair>> getMappedGoals() {
-        return mappedGoals;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    private static HashMap<String, LinkedList<Pair>> mappedGoals;
+    private final HashMap<Character, LinkedList<Pair>> mappedBoard;
     private GameBoard parent;
     private static boolean boardFlag = false;
     static long totalOpen = 0;
@@ -23,9 +15,11 @@ public class GameBoard {
     private int info = 0;
     private int stateValue = 0;
     private int stateScale;
-    static int cycle = 0;
     private int childAfterHeuristic = 0;
 
+    static int cycle = 0;
+    private static HashMap<Character, LinkedList<Pair>> mappedGoals;
+    private static char[][] goal;
 
     public GameBoard getParent() {
         return parent;
@@ -36,21 +30,35 @@ public class GameBoard {
         size = gi.getInit().length;
         board = gi.getInit();
         goal = gi.getGoal();
+        mappedGoals = new HashMap<>();
+        mappedBoard = new HashMap<>();
         initializeBoard3Or5(gi.getInit());
         initializeBoard3Or5(gi.getGoal());
         parent = null;
         isOpen = gi.isNoOpen();
 
+
     }
 
-    public GameBoard(String[][] board) {
+    public GameBoard(char[][] board) {
         this.board = board;
         this.size = board.length;
+        mappedBoard = new HashMap<>();
+        if (size == 3) {
+            mappedBoard.put('R', new LinkedList<>());
+            mappedBoard.put('B', new LinkedList<>());
+            mappedBoard.put('G', new LinkedList<>());
+        } else {
+            mappedBoard.put('R', new LinkedList<>());
+            mappedBoard.put('B', new LinkedList<>());
+            mappedBoard.put('G', new LinkedList<>());
+            mappedBoard.put('Y', new LinkedList<>());
+        }
     }
 
-    private void initializeBoard3Or5(String[][] mat) {
-        mappedGoals = new HashMap<>();
-        String[][] temp;
+    private void initializeBoard3Or5(char[][] mat) {
+
+        char[][] temp;
         if (!boardFlag) {
             temp = board;
         } else {
@@ -58,38 +66,54 @@ public class GameBoard {
         }
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat.length; j++) {
-                if ("R".equals(mat[i][j])) {
+                if ('R' == mat[i][j]) {
                     temp[i][j] = mat[i][j];
-                    if (boardFlag && !mappedGoals.containsKey("R")) {
-                        mappedGoals.put("R", new LinkedList<>());
-                        mappedGoals.get("R").add(new Pair(i, j));
+                    if (boardFlag && !mappedGoals.containsKey('R')) {
+                        mappedGoals.put('R', new LinkedList<>());
+                        mappedGoals.get('R').add(new Pair(i, j));
                     } else if (boardFlag) {
-                        mappedGoals.get("R").add(new Pair(i, j));
-                    }
-                } else if ("Y".equals(mat[i][j])) {
+                        mappedGoals.get('R').add(new Pair(i, j));
+                    } else if (!mappedBoard.containsKey('R')) {
+                        mappedBoard.put('R', new LinkedList<>());
+                        mappedBoard.get('R').add(new Pair(i, j));
+                    } else
+                        mappedBoard.get('R').add(new Pair(i, j));
+                } else if ('Y' == mat[i][j]) {
                     temp[i][j] = mat[i][j];
-                    if (boardFlag && !mappedGoals.containsKey("Y")) {
-                        mappedGoals.put("Y", new LinkedList<>());
-                        mappedGoals.get("Y").add(new Pair(i, j));
+                    if (boardFlag && !mappedGoals.containsKey('Y')) {
+                        mappedGoals.put('Y', new LinkedList<>());
+                        mappedGoals.get('Y').add(new Pair(i, j));
                     } else if (boardFlag) {
-                        mappedGoals.get("Y").add(new Pair(i, j));
-                    }
-                } else if ("B".equals(mat[i][j])) {
+                        mappedGoals.get('Y').add(new Pair(i, j));
+                    } else if (!mappedBoard.containsKey('Y')) {
+                        mappedBoard.put('Y', new LinkedList<>());
+                        mappedBoard.get('Y').add(new Pair(i, j));
+                    } else
+                        mappedBoard.get('Y').add(new Pair(i, j));
+                } else if ('B' == mat[i][j]) {
                     temp[i][j] = mat[i][j];
-                    if (boardFlag && !mappedGoals.containsKey("B")) {
-                        mappedGoals.put("B", new LinkedList<>());
-                        mappedGoals.get("B").add(new Pair(i, j));
+                    if (boardFlag && !mappedGoals.containsKey('B')) {
+                        mappedGoals.put('B', new LinkedList<>());
+                        mappedGoals.get('B').add(new Pair(i, j));
                     } else if (boardFlag) {
-                        mappedGoals.get("B").add(new Pair(i, j));
-                    }
-                } else if ("G".equals(mat[i][j])) {
+                        mappedGoals.get('B').add(new Pair(i, j));
+                    } else if (!mappedBoard.containsKey('B')) {
+                        mappedBoard.put('B', new LinkedList<>());
+                        mappedBoard.get('B').add(new Pair(i, j));
+                    } else
+                        mappedBoard.get('B').add(new Pair(i, j));
+                } else if ('G' == mat[i][j]) {
                     temp[i][j] = mat[i][j];
-                    if (boardFlag && !mappedGoals.containsKey("G")) {
-                        mappedGoals.put("G", new LinkedList<>());
-                        mappedGoals.get("G").add(new Pair(i, j));
+                    if (boardFlag && !mappedGoals.containsKey('G')) {
+                        mappedGoals.put('G', new LinkedList<>());
+                        mappedGoals.get('G').add(new Pair(i, j));
                     } else if (boardFlag) {
-                        mappedGoals.get("G").add(new Pair(i, j));
-                    }
+                        mappedGoals.get('G').add(new Pair(i, j));
+                    } else if (!mappedBoard.containsKey('G')) {
+                        mappedBoard.put('G', new LinkedList<>());
+                        mappedBoard.get('G').add(new Pair(i, j));
+                    } else
+                        mappedBoard.get('G').add(new Pair(i, j));
                 } else
                     temp[i][j] = mat[i][j];
             }
@@ -102,7 +126,7 @@ public class GameBoard {
         ArrayList<GameBoard> gb = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (board[i][j].equals("_")) {
+                if (board[i][j] == '_') {
                     moveLeft(i, j, gb);
                     moveRight(i, j, gb);
                     moveUp(i, j, gb);
@@ -116,43 +140,43 @@ public class GameBoard {
     }
 
     private void moveRight(int row, int column, ArrayList<GameBoard> gb) {
-        if (column + 1 < size && !board[row][column + 1].equals("_")) {
-
-            String[][] nextState = new String[size][size];
+        if (column + 1 < size && board[row][column + 1] != '_') {
+            char[][] nextState = new char[size][size];
             copyState(nextState);
 
 
-            String temp = nextState[row][column + 1];
+            char temp = nextState[row][column + 1];
             nextState[row][column + 1] = nextState[row][column];
-            createChild(row, column, nextState, temp, gb);
+            createChild(row, column, nextState, temp, gb, 'r');
         }
 
     }
 
     private void moveLeft(int row, int column, ArrayList<GameBoard> gb) {
-        if (column - 1 >= 0 && !board[row][column - 1].equals("_")) {
+        if (column - 1 >= 0 && board[row][column - 1] != '_') {
 
-            String[][] nextState = new String[size][size];
+
+            char[][] nextState = new char[size][size];
             copyState(nextState);
 
 
-            String temp = nextState[row][column - 1];
+            char temp = nextState[row][column - 1];
             nextState[row][column - 1] = nextState[row][column];
-            createChild(row, column, nextState, temp, gb);
+            createChild(row, column, nextState, temp, gb, 'l');
         }
 
     }
 
     private void moveUp(int row, int column, ArrayList<GameBoard> gb) {
-        if (row - 1 >= 0 && !board[row - 1][column].equals("_")) {
+        if (row - 1 >= 0 && board[row - 1][column] != '_') {
 
-            String[][] nextState = new String[size][size];
+            char[][] nextState = new char[size][size];
             copyState(nextState);
 
 
-            String temp = nextState[row - 1][column];
+            char temp = nextState[row - 1][column];
             nextState[row - 1][column] = nextState[row][column];
-            createChild(row, column, nextState, temp, gb);
+            createChild(row, column, nextState, temp, gb, 'u');
 
         }
 
@@ -160,48 +184,103 @@ public class GameBoard {
 
 
     private void moveDown(int row, int column, ArrayList<GameBoard> gb) {
-        if (row + 1 < size && !board[row + 1][column].equals("_")) {
+        if (row + 1 < size && board[row + 1][column] != '_') {
 
-            String[][] nextState = new String[size][size];
+            char[][] nextState = new char[size][size];
             copyState(nextState);
 
 
-            String temp = nextState[row + 1][column];
+            char temp = nextState[row + 1][column];
             nextState[row + 1][column] = nextState[row][column];
-            createChild(row, column, nextState, temp, gb);
+            createChild(row, column, nextState, temp, gb, 'd');
         }
 
     }
 
-    private void createChild(int row, int column, String[][] nextState, String temp, ArrayList<GameBoard> gb) {
+    private void createChild(int row, int column, char[][] nextState, char temp, ArrayList<GameBoard> gb, char direction) {
         nextState[row][column] = temp;
         if (parent != null && Arrays.deepEquals(nextState, parent.board))
             return;
         GameBoard child = new GameBoard(nextState);
-        totalOpen++;
+        clone(child.mappedBoard);
+        if (direction == 'r') {
+            for (Pair p : mappedBoard.get(temp)) {
+                if (p.getI() == row && p.getJ() == column + 1) {
+                    child.mappedBoard.get(temp).remove(p);
+                    break;
+                }
+            }
+        } else if (direction == 'l') {
+            for (Pair p : mappedBoard.get(temp)) {
+                if (p.getI() == row && p.getJ() == column - 1) {
+                    child.mappedBoard.get(temp).remove(p);
+                    break;
+                }
+            }
+        } else if (direction == 'u') {
+            for (Pair p : mappedBoard.get(temp)) {
+                if (p.getI() == row - 1 && p.getJ() == column) {
+                    child.mappedBoard.get(temp).remove(p);
+                    break;
+                }
+            }
+        } else if (direction == 'd') {
+            for (Pair p : mappedBoard.get(temp)) {
+                if (p.getI() == row + 1 && p.getJ() == column) {
+                    child.mappedBoard.get(temp).remove(p);
+                    break;
+
+                }
+            }
+
+        }
+        child.mappedBoard.get(temp).push(new Pair(row, column));
         child.parent = this;
         child.stateValue += this.stateValue + afterMoveValue(temp);
         child.stateScale = cycle;
         gb.add(child);
+        totalOpen++;
 
 
     }
 
-    public static int afterMoveValue(String color) {
+    private void clone(HashMap<Character, LinkedList<Pair>> mappedBoard) {
+        for (Map.Entry<Character, LinkedList<Pair>> entry : this.mappedBoard.entrySet()) {
+            if (entry.getKey() == 'R') {
+                for (Pair p : entry.getValue()) {
+                    mappedBoard.get('R').add(new Pair(p.getI(), p.getJ()));
+                }
+            } else if (entry.getKey() == 'G') {
+                for (Pair p : entry.getValue()) {
+                    mappedBoard.get('G').add(new Pair(p.getI(), p.getJ()));
+                }
+            } else if (entry.getKey() == 'Y') {
+                for (Pair p : entry.getValue()) {
+                    mappedBoard.get('Y').add(new Pair(p.getI(), p.getJ()));
+                }
+            } else if (entry.getKey() == 'B') {
+                for (Pair p : entry.getValue()) {
+                    mappedBoard.get('B').add(new Pair(p.getI(), p.getJ()));
+                }
+            }
+        }
+    }
+
+    public static int afterMoveValue(char color) {
         switch (color) {
-            case "R":
-            case "Y":
+            case 'R':
+            case 'Y':
                 return 1;
-            case "B":
+            case 'B':
                 return 2;
-            case "G":
+            case 'G':
                 return 10;
             default:
                 return 0;
         }
     }
 
-    private void copyState(String[][] nextState) {
+    private void copyState(char[][] nextState) {
         for (int i = 0; i < size; i++) {
             System.arraycopy(board[i], 0, nextState[i], 0, size);
         }
@@ -210,7 +289,7 @@ public class GameBoard {
     public boolean isGoal() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (!board[i][j].equals(goal[i][j]))
+                if (board[i][j] != goal[i][j])
                     return false;
             }
         }
@@ -246,7 +325,7 @@ public class GameBoard {
 
     }
 
-    public String[][] getBoard() {
+    public char[][] getBoard() {
         return board;
     }
 
@@ -272,6 +351,15 @@ public class GameBoard {
 
     public int getChildAfterHeuristic() {
         return childAfterHeuristic;
+    }
+    public HashMap<Character, LinkedList<Pair>> getMappedBoard() {
+        return mappedBoard;
+    }
+    public static HashMap<Character, LinkedList<Pair>> getMappedGoals() {
+        return mappedGoals;
+    }
+    public int getSize() {
+        return size;
     }
 
     static class GameBoardComparator implements Comparator<GameBoard> {
