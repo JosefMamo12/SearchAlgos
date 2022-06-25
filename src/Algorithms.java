@@ -9,6 +9,9 @@ import java.util.*;
  * 5)DFBnB
  */
 public class Algorithms {
+    private GameBoard root;
+    private GameManager gameManager;
+    private final MyFrame frame;
     private boolean isOpen;
     private String outputPath = "";
     private String num = "";
@@ -18,12 +21,21 @@ public class Algorithms {
     private static final char[] color4 = new char[]{'R', 'B', 'G', 'Y'};
     private final Stack<GameBoard> path = new Stack<>();
 
+
     /**
      * The breadth first search algorithm to find the minimal steps to get from root board to get to the goal board
      * by using queue, that's the order of the expansion from the root after it all his neighbors etc...
      *
-     * @param root - Starting board
+     * @param - Starting board
      */
+
+    public Algorithms(MyFrame frame, GameBoard gb, GameManager gm) {
+        this.frame = frame;
+        this.root = gb;
+        this.gameManager = gm;
+        gm.run();
+    }
+
     public void bfs(GameBoard root) {
         isOpen = root.isOpen();
         GameBoard poopedOne;
@@ -32,8 +44,17 @@ public class Algorithms {
         Hashtable<GameBoard, GameBoard> closedList = new Hashtable<>();
         openList.add(root);
         openListHash.put(root, root);
+
         while (!openList.isEmpty()) {
             GameBoard currBoard = openList.poll();
+            gameManager.update(currBoard.getBoard(), currBoard.getStateValue());
+            frame.repaint();
+            try {
+                Thread.sleep(gameManager.getVelocity());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             poopedOne = currBoard;
             openListHash.remove(currBoard);
             closedList.put(currBoard, currBoard);
@@ -43,6 +64,8 @@ public class Algorithms {
                     openListHash.put(child, child);
                 }
                 if (child.isGoal()) {
+                    gameManager.update(child.getBoard(), child.getStateValue());
+                    frame.repaint();
                     buildAnswer(child);
                     return;
                 }
@@ -80,6 +103,13 @@ public class Algorithms {
     private GameBoard limitedDFS(GameBoard curr, int depth, Hashtable<GameBoard, GameBoard> loopAvoidance) {
         /* 0 = False, 1 = True, 2 = Fail */
         GameBoard cutoff = new GameBoard(curr.getBoard());
+        gameManager.update(curr.getBoard(), curr.getStateValue());
+        try {
+            Thread.sleep(gameManager.getVelocity());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        frame.repaint();
         cutoff.setInfo(1);
 
         if (curr.isGoal()) {
@@ -131,6 +161,13 @@ public class Algorithms {
         openListHash.put(root, root);
         while (!openListQueue.isEmpty()) {
             GameBoard curr = openListQueue.poll();
+            gameManager.update(curr.getBoard(), curr.getStateValue());
+            frame.repaint();
+            try {
+                Thread.sleep(gameManager.getVelocity());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             poopedOne = curr;
             openListHash.remove(curr);
             closedList.add(curr);
@@ -174,6 +211,14 @@ public class Algorithms {
             loopAvoidance.put(root, root);
             while (!openListStack.isEmpty()) {
                 GameBoard curr = openListStack.pop();
+                gameManager.setThreshold(maxH);
+                gameManager.update(curr.getBoard(), curr.getStateValue());
+                frame.repaint();
+                try {
+                    Thread.sleep(gameManager.getVelocity());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 poopedOne = curr;
                 if (curr.getInfo() == 1) {  /*means marked 'out'*/
                     loopAvoidance.remove(curr);
@@ -223,17 +268,29 @@ public class Algorithms {
     public void dfbnb(GameBoard root) {
         isOpen = root.isOpen();
         GameBoard poopedOne;
-        int size = root.getSize();
+
+
         Stack<GameBoard> st = new Stack<>();
         ArrayList<GameBoard> childList = new ArrayList<>();
         Hashtable<GameBoard, GameBoard> loopAvoidance = new Hashtable<>();
         GameBoard result = null;
+
         int t = Integer.MAX_VALUE;
-        root.setChildAfterHeuristic(root.getStateValue() + heuristic(root, size));
+        root.setChildAfterHeuristic(heuristic(root,root.getSize()));
         st.add(root);
         loopAvoidance.put(root, root);
+
+
         while (!st.isEmpty()) {
             GameBoard curr = st.pop();
+            gameManager.setThreshold(t);
+            gameManager.update(curr.getBoard(), curr.getStateValue());
+            try {
+                Thread.sleep(gameManager.getVelocity());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            frame.repaint();
             poopedOne = curr;
             if (curr.getInfo() == 1) {
                 loopAvoidance.remove(curr);
@@ -243,15 +300,17 @@ public class Algorithms {
                 childList = curr.expandMove();/* Return all the possible movements as list */
                 setChildHeuristicDistances(childList);
                 childList.sort(new GameBoard.GameBoardComparator());
-                for (int i = childList.size() - 1; i >= 0; i--) {
+                for (int i = 0 ; i < childList.size(); i++) {
                     GameBoard child = childList.get(i);
                     if (child.getChildAfterHeuristic() >= t) {
-                        childList = returnNewChildList(childList, i);
+                        returnNewChildList(childList,  i- 1);
                     } else if (loopAvoidance.containsKey(child) && loopAvoidance.get(child).getInfo() == 1) {
                         childList.remove(child);
+                        i--;
                     } else if (loopAvoidance.containsKey(child) && loopAvoidance.get(child).getInfo() == 0) {
                         if (loopAvoidance.get(child).getChildAfterHeuristic() <= child.getChildAfterHeuristic()) {
                             childList.remove(child);
+                            i--;
                         } else {
                             st.remove(loopAvoidance.get(child));
                             loopAvoidance.remove(child);
@@ -259,15 +318,16 @@ public class Algorithms {
                     } else if (child.isGoal()) {
                         t = child.getChildAfterHeuristic();
                         result = child;
-                        childList = returnNewChildList(childList, i);
+                        returnNewChildList(childList, i - 1);
 
                     }
                 }
 
             }
-            for (int i = childList.size() - 1; i >= 0; i--) {
-                st.add(childList.get(i));
-                loopAvoidance.put(childList.get(i), childList.get(i));
+            Collections.reverse(childList);
+            for (GameBoard gameBoard : childList) {
+                st.add(gameBoard);
+                loopAvoidance.put(gameBoard, gameBoard);
 
             }
             if (isOpen) {
@@ -472,12 +532,11 @@ public class Algorithms {
     }
 
 
-    private ArrayList<GameBoard> returnNewChildList(ArrayList<GameBoard> childList, int i) {
-        ArrayList<GameBoard> tempGameBoardList = new ArrayList<>();
-        for (int j = 0; j < i; j++) {
-            tempGameBoardList.add(childList.get(j));
-        }
-        return tempGameBoardList;
+    private void returnNewChildList(ArrayList<GameBoard> childList, int i) {
+        if(i == childList.size() - 1)
+            return;
+        returnNewChildList (childList, ++i);
+        childList.remove(i);
     }
 
 

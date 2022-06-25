@@ -4,14 +4,32 @@ import java.io.IOException;
 /**
  * Main project to run all the project by using that we get from the GameInfo class.
  */
-public class Ex1 {
+public class Ex1 implements Runnable {
+    long start = 0, end = 0;
+    GameInfo info;
+    GameBoard gb;
+    Algorithms a;
+    MyFrame frame;
+
+
+    private void init() {
+        info = new GameInfo("src/input.txt");
+        gb = new GameBoard(info);
+        GameManager gm = new GameManager(gb.getBoard(), info);
+        frame = new MyFrame(gm);
+        a = new Algorithms(frame, gb, gm);
+    }
+
+
     public static void main(String[] args) {
+        Thread ex1 = new Thread(new Ex1());
+        ex1.start();
+    }
 
-        long start = 0, end = 0;
-        GameInfo info = new GameInfo("src/input.txt");
-        GameBoard gb = new GameBoard(info);
-        Algorithms a = new Algorithms();
 
+    @Override
+    public void run() {
+        init();
         switch (info.getAlgo()) {
             case "BFS":
                 start = System.currentTimeMillis();
@@ -33,7 +51,7 @@ public class Ex1 {
                 a.idaStar(gb);
                 end = System.currentTimeMillis();
                 break;
-            case ("DFBnB")    :
+            case ("DFBnB"):
                 start = System.currentTimeMillis();
                 a.dfbnb(gb);
                 end = System.currentTimeMillis();
@@ -50,7 +68,8 @@ public class Ex1 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
+
+
 
