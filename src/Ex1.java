@@ -13,9 +13,9 @@ public class Ex1 implements Runnable {
 
 
     private void init() {
-        info = new GameInfo("src/input.txt");
+        info = new GameInfo("src/input2.txt");
         gb = new GameBoard(info);
-        GameManager gm = new GameManager(gb.getBoard(), info);
+        GameManager gm = new GameManager(gb.getBoard(), info,gb);
         frame = new MyFrame(gm);
         a = new Algorithms(frame, gb, gm);
     }

@@ -19,7 +19,7 @@ public class GameBoard  {
 
     static int cycle = 0;
     private static HashMap<Character, LinkedList<Pair>> mappedGoals;
-    private static char[][] goal;
+    public static char[][] goal;
 
     public GameBoard getParent() {
         return parent;

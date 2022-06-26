@@ -173,6 +173,8 @@ public class Algorithms {
             closedList.add(curr);
             if (curr.isGoal()) {
                 buildAnswer(curr);
+                gameManager.update(curr.getBoard(),curr.getStateValue());
+                frame.repaint();
                 return;
             }
             for (GameBoard child : curr.expandMove()) {
@@ -244,6 +246,8 @@ public class Algorithms {
                         }
                         if (child.isGoal()) {
                             buildAnswer(child);
+                            gameManager.update(child.getBoard(),child.getStateValue());
+                            frame.repaint();
                             return;
                         }
                         openListStack.add(child);
@@ -337,6 +341,8 @@ public class Algorithms {
             }
         }
         if (result != null) {
+            gameManager.update(result.getBoard(), result.getStateValue());
+            frame.repaint();
             buildAnswer(result);
         } else {
             outputPath += "no path";

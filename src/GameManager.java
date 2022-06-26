@@ -2,17 +2,23 @@ public class GameManager {
 
     private final GameInfo gameInfo;
     private final char[][] gameMat;
+    private char [][] initState;
+
     private int score;
     private boolean run;
     private int velocity;
     private int threshold;
     static int currentPosition = 5;
+    private GameBoard gameBoard;
     final Object lock;
 
     public GameInfo getGameInfo() {
         return gameInfo;
     }
 
+    public GameBoard getGameBoard() {
+        return gameBoard;
+    }
 
     public char[][] getGameMat() {
         return gameMat;
@@ -153,13 +159,22 @@ public class GameManager {
         return run;
     }
 
-    public GameManager(char[][] mat, GameInfo info) {
+    public GameManager(char[][] mat, GameInfo info, GameBoard gameBoard) {
+        this.gameBoard = gameBoard;
+        this.initState = new char[mat.length][mat.length];
+        for (int i = 0; i < mat.length ; i++) {
+            System.arraycopy(mat[i],0,initState[i],0,mat.length);
+        }
         gameMat = new char[mat.length][mat.length];
         gameInfo = info;
         lock = new Object();
         run = false;
         velocity = 10;
 
+    }
+
+    public char[][] getInitState() {
+        return initState;
     }
 
     public void update(char[][] mat, int stateValue) {
