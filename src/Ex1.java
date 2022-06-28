@@ -1,6 +1,3 @@
-import java.io.FileWriter;
-import java.io.IOException;
-
 /**
  * Main project to run all the project by using that we get from the GameInfo class.
  */
@@ -15,7 +12,7 @@ public class Ex1 implements Runnable {
     private void init() {
         info = new GameInfo("src/input2.txt");
         gb = new GameBoard(info);
-        GameManager gm = new GameManager(gb.getBoard(), info.getAlgo(),GameBoard.goal);
+        GameManager gm = new GameManager(gb.getBoard(), info.getAlgo(), GameBoard.goal);
         frame = new MyFrame(gm);
         a = new Algorithms(frame, gb, gm);
     }
@@ -29,7 +26,7 @@ public class Ex1 implements Runnable {
 
     @Override
     public void run() {
-        new LaunchWindow();
+            new LaunchWindow();
 //        init();
 //        switch (info.getAlgo()) {
 //            case "BFS":
@@ -69,8 +66,10 @@ public class Ex1 implements Runnable {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
+
+        }
     }
-}
+
 
 
 

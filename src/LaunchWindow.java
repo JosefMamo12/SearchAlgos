@@ -1,37 +1,21 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class LaunchWindow implements ActionListener {
-    JFrame frame = new JFrame();
-    JButton button = new JButton("Next");
-
-   public LaunchWindow() {
-
-        button.setBounds(700,700,200,40);
-        button.setFocusable(false);
-        button.addActionListener(this);
+public class LaunchWindow extends JFrame {
+//    JFrame frame = new JFrame();
 
 
-        frame.add(button);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(null);
-        frame.setSize(1000, 800);
-        frame.setVisible(true);
-        frame.setTitle("Bars");
-        frame.add(new LaunchPanel());
+    public LaunchWindow()  {
 
 
-    }
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(null);
+        this.setSize(1000, 800);
+        this.setVisible(true);
+        this.setTitle("Bars");
+        this.add(new LaunchPanel(this));
 
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == button){
-//            new MatrixDrawer();
-        }
     }
 }
+
 

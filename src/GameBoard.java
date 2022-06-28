@@ -6,8 +6,8 @@ public class GameBoard  {
     //    private final String[][] board;
     private final char[][] board;
     //    private static String[][] goal;
-    private final int size;
-    private final HashMap<Character, LinkedList<Pair>> mappedBoard;
+    private  int size;
+    private HashMap<Character, LinkedList<Pair>> mappedBoard;
     private GameBoard parent;
     private static boolean boardFlag = false;
     static long totalOpen = 0;
@@ -38,6 +38,15 @@ public class GameBoard  {
         isOpen = gi.isNoOpen();
 
 
+    }
+    public GameBoard(char[][] init, char [][] goal){
+        size = init.length;
+        board = init;
+        GameBoard.goal = goal;
+        mappedGoals = new HashMap<>();
+        mappedBoard = new HashMap<>();
+        initializeBoard3Or5(init);
+        initializeBoard3Or5(goal);
     }
 
     public GameBoard(char[][] board) {

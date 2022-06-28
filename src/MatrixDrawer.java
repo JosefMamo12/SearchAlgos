@@ -21,15 +21,17 @@ public class MatrixDrawer extends JPanel {
         rowColumnLength = gameManager.getGameMat().length;
         sButton = new JButton();
         vButton = new JButton();
-        this.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
-        this.setBorder(border);
+        this.setLayout(null);
+        this.setBounds(0,0,1000,800);
+//        this.setBorder(border);
         this.add(vButton);
         this.add(sButton);
-        this.setBackground(Color.BLACK);
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        System.out.println("Is prinitng?");
         vButton.setBounds(800, 150, 80, 80);
         vButton.setText("Faster");
         vButton.addActionListener(new myActionListener());

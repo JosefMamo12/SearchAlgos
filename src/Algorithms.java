@@ -19,6 +19,7 @@ public class Algorithms {
     private final int valueAdder = 0;
     private static final char[] color3 = new char[]{'R', 'B', 'G'};
     private static final char[] color4 = new char[]{'R', 'B', 'G', 'Y'};
+    MatrixDrawer matrixDrawer;
     private final Stack<GameBoard> path = new Stack<>();
 
 
