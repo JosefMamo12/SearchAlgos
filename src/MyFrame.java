@@ -17,10 +17,12 @@ public class MyFrame extends JFrame{
             this.setResizable(false);
             this.setVisible(true);
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            this.setLayout(new BorderLayout());
+            this.setLayout(null);
             this.setSize(1000, 800);
             this.setTitle("Ball Game");
+
             this.add(matrixDrawer);
+
 
 //        this.pack();
 

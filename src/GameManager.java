@@ -1,23 +1,41 @@
 public class GameManager {
 
-    private final GameInfo gameInfo;
     private final char[][] gameMat;
-    private char [][] initState;
+    private final char[][] initState;
+    private final char[][] goalState;
 
+    private final String info;
     private int score;
     private boolean run;
     private int velocity;
     private int threshold;
     static int currentPosition = 5;
-    private GameBoard gameBoard;
     final Object lock;
 
-    public GameInfo getGameInfo() {
-        return gameInfo;
+
+    public GameManager(char[][] mat, String info, char[][] goal) {
+        this.initState = new char[mat.length][mat.length];
+        this.goalState = new char[mat.length][mat.length];
+        for (int i = 0; i < mat.length; i++) {
+            System.arraycopy(goal[i], 0, goalState[i], 0, mat.length);
+        }
+        for (int i = 0; i < mat.length; i++) {
+            System.arraycopy(mat[i], 0, initState[i], 0, mat.length);
+        }
+        gameMat = new char[mat.length][mat.length];
+        this.info = info;
+        lock = new Object();
+        run = false;
+        velocity = 10;
+
+    }
+    public String getInfo(){
+        return this.info;
     }
 
-    public GameBoard getGameBoard() {
-        return gameBoard;
+
+    public char[][] getGoalState() {
+        return goalState;
     }
 
     public char[][] getGameMat() {
@@ -159,19 +177,6 @@ public class GameManager {
         return run;
     }
 
-    public GameManager(char[][] mat, GameInfo info, GameBoard gameBoard) {
-        this.gameBoard = gameBoard;
-        this.initState = new char[mat.length][mat.length];
-        for (int i = 0; i < mat.length ; i++) {
-            System.arraycopy(mat[i],0,initState[i],0,mat.length);
-        }
-        gameMat = new char[mat.length][mat.length];
-        gameInfo = info;
-        lock = new Object();
-        run = false;
-        velocity = 10;
-
-    }
 
     public char[][] getInitState() {
         return initState;

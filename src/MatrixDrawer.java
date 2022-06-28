@@ -65,8 +65,8 @@ public class MatrixDrawer extends JPanel {
                     g2d.drawString("Goal",200 ,580);
                 }
 
-                matrixCreator(GameBoard.goal[indexJ][indexI], font,paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
-                g2d.drawString(String.valueOf(GameBoard.goal[indexJ++][indexI]), paddleX + 10, paddleY + 20);
+                matrixCreator(gameManager.getGoalState()[indexJ][indexI], font,paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
+                g2d.drawString(String.valueOf(gameManager.getGoalState()[indexJ++][indexI]), paddleX + 10, paddleY + 20);
             }
             indexJ = 0;
             indexI++;
@@ -119,8 +119,8 @@ public class MatrixDrawer extends JPanel {
         g.drawString("Score: " + gameManager.getScore(), 50, 80);
         g.setColor(Color.BLACK);
         g.setFont(new Font("David", Font.BOLD, 60));
-        g.drawString(gameManager.getGameInfo().getAlgo(), 50, 50);
-        if (gameManager.getGameInfo().getAlgo().equals("DFBnB") || gameManager.getGameInfo().getAlgo().equals("IDA*")) {
+        g.drawString(gameManager.getInfo(), 50, 50);
+        if (gameManager.getInfo().equals("DFBnB") || gameManager.getInfo().equals("IDA*")) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("David", Font.BOLD, 26));
             if (gameManager.getThreshold() != Integer.MAX_VALUE) {
@@ -146,7 +146,7 @@ public class MatrixDrawer extends JPanel {
             }
             indexJ = 0;
             indexI++;
-        }
+         }
     }
 
     private void printMat() {
@@ -158,7 +158,7 @@ public class MatrixDrawer extends JPanel {
         }
     }
 
-    public void drawRectangleByString(char c, Graphics2D g2d, int currX, int currY,  int boxWidth, int boxHeight) {
+    public static void drawRectangleByString(char c, Graphics2D g2d, int currX, int currY,  int boxWidth, int boxHeight) {
         switch (c) {
             case 'G':
                 g2d.setColor(new Color(0, 255, 0));
