@@ -31,7 +31,6 @@ public class MatrixDrawer extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        System.out.println("Is prinitng?");
         vButton.setBounds(800, 150, 80, 80);
         vButton.setText("Faster");
         vButton.addActionListener(new myActionListener());
@@ -39,14 +38,14 @@ public class MatrixDrawer extends JPanel {
         sButton.setText("Slower");
         sButton.addActionListener(new myActionListener());
 
-        printInit(g);
-        printGoal(g);
+        printInit(g, gameManager.getInitState(), font,rowColumnLength);
+        printGoal(g, gameManager.getGoalState(), font,rowColumnLength);
         printMatrix(g);
         printScore(g);
 
     }
 
-    private void printGoal(Graphics g) {
+    public static void printGoal(Graphics g, char [][] goalState,Font font, int rowColumnLength) {
 
         int indexI = 0, indexJ = 0;
         int paddleX, paddleY;
@@ -67,15 +66,15 @@ public class MatrixDrawer extends JPanel {
                     g2d.drawString("Goal",200 ,580);
                 }
 
-                matrixCreator(gameManager.getGoalState()[indexJ][indexI], font,paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
-                g2d.drawString(String.valueOf(gameManager.getGoalState()[indexJ++][indexI]), paddleX + 10, paddleY + 20);
+                matrixCreator(goalState[indexJ][indexI], font,paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
+                g2d.drawString(String.valueOf(goalState[indexJ++][indexI]), paddleX + 10, paddleY + 20);
             }
             indexJ = 0;
             indexI++;
         }
     }
 
-    private void printInit(Graphics g) {
+    public static void printInit(Graphics g, char[][] initState, Font font, int rowColumnLength) {
         int indexI = 0, indexJ = 0;
         int paddleX, paddleY;
         int smallBoxHeight = boxHeight / 3;
@@ -96,15 +95,15 @@ public class MatrixDrawer extends JPanel {
                     g2d.drawString("Initial",50,580);
                 }
 
-                matrixCreator(gameManager.getInitState()[indexJ][indexI], font, paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
-                g2d.drawString(String.valueOf(gameManager.getInitState()[indexJ++][indexI]), paddleX + 10, paddleY + 20);
+                matrixCreator(initState[indexJ][indexI], font, paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
+                g2d.drawString(String.valueOf(initState[indexJ++][indexI]), paddleX + 10, paddleY + 20);
             }
             indexJ = 0;
             indexI++;
         }
     }
 
-    private void matrixCreator(char c, Font font, int paddleX, int paddleY, int boxWidth, int boxHeight, Graphics2D g2d) {
+    public static void matrixCreator(char c, Font font, int paddleX, int paddleY, int boxWidth, int boxHeight, Graphics2D g2d) {
         drawRectangleByString(c, g2d, paddleX, paddleY ,boxWidth, boxHeight);
 
         BasicStroke stroke = new BasicStroke(3);
