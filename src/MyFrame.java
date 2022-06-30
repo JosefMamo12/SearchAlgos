@@ -22,7 +22,7 @@ public class MyFrame extends JFrame implements Runnable {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
-        this.setSize(1000, 800);
+        this.setSize(LaunchPanel.SCREEN_WIDTH, LaunchPanel.SCREEN_HEIGHT);
         this.setTitle("Ball Game");
         this.setVisible(true);
         this.setBackground(Color.white);
@@ -37,7 +37,7 @@ public class MyFrame extends JFrame implements Runnable {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
-        this.setSize(1000, 800);
+        this.setSize(LaunchPanel.SCREEN_WIDTH, LaunchPanel.SCREEN_HEIGHT);
         this.setTitle("Ball Game");
         this.setVisible(true);
         this.setBackground(Color.white);

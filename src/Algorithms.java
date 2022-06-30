@@ -13,14 +13,14 @@ public class Algorithms {
     private GameManager gameManager;
     private final MyFrame frame;
     private boolean isOpen;
-    private String outputPath = "";
+    public static String outputPath = "";
     private String num = "";
     private String cost = "inf";
     private final int valueAdder = 0;
     private static final char[] color3 = new char[]{'R', 'B', 'G'};
     private static final char[] color4 = new char[]{'R', 'B', 'G', 'Y'};
     MatrixDrawer matrixDrawer;
-    private final Stack<GameBoard> path = new Stack<>();
+    public static Stack<GameBoard> path = new Stack<>();
 
 
     /**

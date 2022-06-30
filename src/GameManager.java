@@ -14,6 +14,7 @@ public class GameManager {
 
 
     public GameManager(char[][] mat, String info, char[][] goal) {
+
         this.initState = new char[mat.length][mat.length];
         this.goalState = new char[mat.length][mat.length];
         for (int i = 0; i < mat.length; i++) {
@@ -26,7 +27,7 @@ public class GameManager {
         this.info = info;
         lock = new Object();
         run = false;
-        velocity = 10;
+        velocity = 300;
 
     }
     public String getInfo(){

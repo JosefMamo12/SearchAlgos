@@ -1,12 +1,10 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MatrixDrawer extends JPanel {
     boolean flag = false;
-    Border border = BorderFactory.createLineBorder(Color.green);
     Font font = new Font("MV Boli", Font.BOLD, 14);
     GameManager gameManager;
     static int boxWidth = 85;
@@ -22,7 +20,7 @@ public class MatrixDrawer extends JPanel {
         sButton = new JButton();
         vButton = new JButton();
         this.setLayout(null);
-        this.setBounds(0,0,1000,800);
+        this.setBounds(0, 0, LaunchPanel.SCREEN_WIDTH, LaunchPanel.SCREEN_HEIGHT);
 //        this.setBorder(border);
         this.add(vButton);
         this.add(sButton);
@@ -31,22 +29,23 @@ public class MatrixDrawer extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        vButton.setBounds(800, 150, 80, 80);
+        vButton.setBounds(LaunchPanel.SCREEN_WIDTH - 200, 100, 80, 80);
         vButton.setText("Faster");
         vButton.addActionListener(new myActionListener());
-        sButton.setBounds(800, 240, 80, 80);
+        sButton.setBounds(LaunchPanel.SCREEN_WIDTH - 200, 200, 80, 80);
         sButton.setText("Slower");
         sButton.addActionListener(new myActionListener());
 
-        printInit(g, gameManager.getInitState(), font,rowColumnLength);
-        printGoal(g, gameManager.getGoalState(), font,rowColumnLength);
+        printInit(g, gameManager.getInitState(), font, rowColumnLength);
+        printGoal(g, gameManager.getGoalState(), font, rowColumnLength);
         printMatrix(g);
         printScore(g);
+        g.setFont(new Font("David", Font.BOLD, 14));
+        g.drawString(Algorithms.outputPath, 0, 700);
 
     }
 
-    public static void printGoal(Graphics g, char [][] goalState,Font font, int rowColumnLength) {
-
+    public static void printGoal(Graphics g, char[][] goalState, Font font, int rowColumnLength) {
         int indexI = 0, indexJ = 0;
         int paddleX, paddleY;
         int smallBoxHeight = boxHeight / 3;
@@ -54,19 +53,19 @@ public class MatrixDrawer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         for (int i = 0; i < rowColumnLength * smallBoxWidth; i += smallBoxWidth) {
             for (int j = 0; j < rowColumnLength * smallBoxWidth; j += smallBoxHeight) {
-                if(rowColumnLength == 3) {
+                if (rowColumnLength == 3) {
                     paddleX = 150 + i;
                     paddleY = 500 + j;
-                    g2d.setFont(new Font("David",Font.BOLD,20));
-                    g2d.drawString("Goal",150,480);
-                }else{
+                    g2d.setFont(new Font("David", Font.BOLD, 20));
+                    g2d.drawString("Goal", 150, 480);
+                } else {
                     paddleX = 200 + i;
                     paddleY = 600 + j;
-                    g2d.setFont(new Font("David",Font.BOLD,20));
-                    g2d.drawString("Goal",200 ,580);
+                    g2d.setFont(new Font("David", Font.BOLD, 20));
+                    g2d.drawString("Goal", 200, 580);
                 }
 
-                matrixCreator(goalState[indexJ][indexI], font,paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
+                matrixCreator(goalState[indexJ][indexI], font, paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
                 g2d.drawString(String.valueOf(goalState[indexJ++][indexI]), paddleX + 10, paddleY + 20);
             }
             indexJ = 0;
@@ -82,21 +81,20 @@ public class MatrixDrawer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         for (int i = 0; i < rowColumnLength * smallBoxWidth; i += smallBoxWidth) {
             for (int j = 0; j < rowColumnLength * smallBoxWidth; j += smallBoxHeight) {
-                if(rowColumnLength == 3) {
+                if (rowColumnLength == 3) {
                     paddleX = 50 + i;
                     paddleY = 500 + j;
-                    g2d.setFont(new Font("David",Font.BOLD,20));
-                    g2d.drawString("Initial",50,480);
-                }else
-                {
+                    g2d.setFont(new Font("David", Font.BOLD, 20));
+                    g2d.drawString("Initial", 50, 480);
+                } else {
                     paddleX = 50 + i;
                     paddleY = 600 + j;
-                    g2d.setFont(new Font("David",Font.BOLD,20));
-                    g2d.drawString("Initial",50,580);
+                    g2d.setFont(new Font("David", Font.BOLD, 20));
+                    g2d.drawString("Initial", 50, 580);
                 }
 
-                matrixCreator(initState[indexJ][indexI], font, paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
-                g2d.drawString(String.valueOf(initState[indexJ++][indexI]), paddleX + 10, paddleY + 20);
+                matrixCreator(initState[indexI][indexJ], font, paddleX, paddleY, smallBoxWidth, smallBoxHeight, g2d);
+                g2d.drawString(String.valueOf(initState[indexI][indexJ++]), paddleX + 10, paddleY + 20);
             }
             indexJ = 0;
             indexI++;
@@ -104,7 +102,7 @@ public class MatrixDrawer extends JPanel {
     }
 
     public static void matrixCreator(char c, Font font, int paddleX, int paddleY, int boxWidth, int boxHeight, Graphics2D g2d) {
-        drawRectangleByString(c, g2d, paddleX, paddleY ,boxWidth, boxHeight);
+        drawRectangleByString(c, g2d, paddleX, paddleY, boxWidth, boxHeight);
 
         BasicStroke stroke = new BasicStroke(3);
         g2d.setStroke(stroke);
@@ -147,7 +145,7 @@ public class MatrixDrawer extends JPanel {
             }
             indexJ = 0;
             indexI++;
-         }
+        }
     }
 
     private void printMat() {
@@ -159,7 +157,7 @@ public class MatrixDrawer extends JPanel {
         }
     }
 
-    public static void drawRectangleByString(char c, Graphics2D g2d, int currX, int currY,  int boxWidth, int boxHeight) {
+    public static void drawRectangleByString(char c, Graphics2D g2d, int currX, int currY, int boxWidth, int boxHeight) {
         switch (c) {
             case 'G':
                 g2d.setColor(new Color(0, 255, 0));
